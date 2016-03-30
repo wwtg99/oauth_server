@@ -1,0 +1,9 @@
+.*
+!.gitignore
+vendor
+storage/*
+composer.lock
+test/*
+!test/*.php
+web/php_errors.log
+!web/.htaccess

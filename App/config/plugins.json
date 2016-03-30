@@ -1,0 +1,10 @@
+{
+    "1": {
+        "name": "PHP",
+        "server_name": "php",
+        "category": "interpreter",
+        "description": "PHP interpreter plugin",
+        "class_name": "App\\Plugin\\PHPInterpreter",
+        "enabled": true
+    }
+}

@@ -1,0 +1,9 @@
+[
+    {
+        "id": "1",
+        "name": "Database Backup",
+        "class_name": "App\\Schedule\\DatabaseBackup",
+        "interval": 1,
+        "enabled": false
+    }
+]

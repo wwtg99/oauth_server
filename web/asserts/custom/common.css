@@ -1,0 +1,44 @@
+body {
+    font-size: 16px;
+    font-family: "Microsoft YaHei", Helvetica, STSong;
+}
+
+.border_div {
+    border: solid 1px black;
+}
+
+.border_head {
+
+}
+
+.border_body {
+    padding: 10px 0 80px 0;
+}
+
+.border_left {
+
+}
+
+.border_center {
+    min-height: 60vh;
+}
+
+.border_right {
+
+}
+
+.border_foot {
+    margin-bottom: 20px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.clear {
+    clear: both;
+}
+
+.center_align {
+    text-align: center;
+}
