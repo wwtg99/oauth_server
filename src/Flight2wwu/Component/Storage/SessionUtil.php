@@ -25,6 +25,11 @@ class SessionUtil implements ServiceProvider, IAttribute
     private $session = [];
 
     /**
+     * @var string
+     */
+    private $prefix;
+
+    /**
      * @return mixed
      */
     public function register()
@@ -38,6 +43,7 @@ class SessionUtil implements ServiceProvider, IAttribute
     public function boot()
     {
         $st = \Flight::get('storage');
+        $this->prefix = array_key_exists('prefix', $st) ? $st['prefix'] . '_' : '';
         $enabled = array_key_exists('session', $st) ? $st['session'] : '';
         if ($enabled) {
             $this->enabled = true;
@@ -53,7 +59,7 @@ class SessionUtil implements ServiceProvider, IAttribute
     public function get($name)
     {
         if ($this->has($name)) {
-            return $this->session[$name][0];
+            return $this->session[$this->prefix . $name][0];
         }
         return null;
     }
@@ -67,7 +73,7 @@ class SessionUtil implements ServiceProvider, IAttribute
     public function set($name, $val, $expire = 0)
     {
         if ($this->enabled) {
-            $this->session[$name] = [$val, $this->calExpireSeconds($expire)];
+            $this->session[$this->prefix . $name] = [$val, $this->calExpireSeconds($expire)];
         }
         return $this;
     }
@@ -79,6 +85,7 @@ class SessionUtil implements ServiceProvider, IAttribute
     public function has($name)
     {
         if ($this->enabled) {
+            $name = $this->prefix . $name;
             if (isset($this->session[$name])) {
                 if (!$this->session[$name][1] || time() <= $this->session[$name][1]) {
                     return true;
@@ -95,7 +102,7 @@ class SessionUtil implements ServiceProvider, IAttribute
     public function delete($name)
     {
         if ($this->has($name)) {
-            unset($this->session[$name]);
+            unset($this->session[$this->prefix . $name]);
         }
         return $this;
     }

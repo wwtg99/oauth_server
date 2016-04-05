@@ -33,6 +33,11 @@ class HomeController extends BaseController
         if ($locale) {
             \Flight::Locale()->setLocale($locale);
             getOValue()->addOld('language', $locale);
+        } else {
+            $locale = getOValue()->getOld('language');
+            if ($locale) {
+                \Flight::Locale()->setLocale($locale);
+            }
         }
         return true;
     }

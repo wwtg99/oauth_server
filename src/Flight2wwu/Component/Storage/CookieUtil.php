@@ -25,6 +25,11 @@ class CookieUtil implements ServiceProvider, IAttribute
     private $cookies = [];
 
     /**
+     * @var string
+     */
+    private $prefix;
+
+    /**
      * @return mixed
      */
     public function register()
@@ -38,6 +43,7 @@ class CookieUtil implements ServiceProvider, IAttribute
     public function boot()
     {
         $st = \Flight::get('storage');
+        $this->prefix = array_key_exists('prefix', $st) ? $st['prefix'] . '_' : '';
         $enabled = array_key_exists('cookie', $st) ? $st['cookie'] : '';
         if ($enabled) {
             $this->enabled = true;
@@ -52,7 +58,7 @@ class CookieUtil implements ServiceProvider, IAttribute
     public function get($name)
     {
         if ($this->has($name)) {
-            return $this->cookies[$name];
+            return $this->cookies[$this->prefix . $name];
         }
         return null;
     }
@@ -66,7 +72,7 @@ class CookieUtil implements ServiceProvider, IAttribute
     public function set($name, $val, $expire = 0)
     {
         if ($this->enabled) {
-            setcookie($name, $val, $this->calExpireSeconds($expire), '/');
+            setcookie($this->prefix . $name, $val, $this->calExpireSeconds($expire), '/');
         }
         return $this;
     }
@@ -103,7 +109,7 @@ class CookieUtil implements ServiceProvider, IAttribute
     public function has($name)
     {
         if ($this->enabled) {
-            return isset($this->cookies[$name]);
+            return isset($this->cookies[$this->prefix . $name]);
         }
         return false;
     }

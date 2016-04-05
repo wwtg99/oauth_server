@@ -201,6 +201,7 @@ return [
                 'ttl'=>3600
             ]
         ],
+        'prefix'=>'fwwu', //prefix for session and cookie, auto add _ after prefix
         'session'=>true, //enable session
         'cookie'=>true, //enable cookie
         'old_value'=>'session', //storage method for old_value: cache, session
