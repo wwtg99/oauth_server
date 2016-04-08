@@ -1,3 +1,8 @@
+## 0.1.1
+ - Update framework
+ - Add more admin for user, role, department, app
+ - Add API for send_email, express_info
+
 ## 0.1.0
  - Components
    - Auth

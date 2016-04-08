@@ -1,6 +1,6 @@
 <div class="container">
     <div class="page-header text-center">
-        <h1><?php TP('Plugins'); ?></h1>
+        <h1><?php TP('Plugin Management'); ?></h1>
     </div>
     <div class="row">
         <div class="col-md-8 col-md-offset-2">

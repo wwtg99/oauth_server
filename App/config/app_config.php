@@ -9,7 +9,8 @@
 return [
     //Application config
     'app'=>'Flight2wwu_OAuth',
-    'version'=>'0.1.0',
+    'version'=>'0.1.1',
+    'framework_version'=>'0.1.5',
     'author'=>'wwu',
     'description'=>'',
     //Timezone and language
@@ -83,6 +84,7 @@ return [
 //                'App\Controller\OAuth'=>'oauth',
                 'App\Controller\Admin'=>'admin',
                 'App\Controller\User'=>'user',
+                'App\Controller\Tool'=>'tool',
             ],
             /**
              * Other route definition file
@@ -163,9 +165,12 @@ return [
                 '/auth/logout' => 3,
                 '/authorize' => 3,
                 '/token' => 3,
+                '/user/*' => 1,
+                '/tool/*' => 1,
             ],
             'admin' => [
-                '*' => 3
+                '*' => 3,
+                '/admin/*' => 3,
             ],
             'common_user' => [
                 '*' => 0,
@@ -175,6 +180,8 @@ return [
                 '/auth/*' => 3,
                 '/oauth/*' => 3,
                 '/changelog' => 1,
+                '/user/*' => 1,
+                '/tool/*' => 1,
             ],
         ],
         'session'=>true, //use session to store user info

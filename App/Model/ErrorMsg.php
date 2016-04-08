@@ -33,6 +33,12 @@ class ErrorMsg
             case 100023: $msg = 'The right is not granted to this access_token'; break;
             case 200001: $msg = 'Fail to update user'; break;
             case 200002: $msg = 'Fail to create user'; break;
+            case 200003: $msg = 'Fail to create app'; break;
+            case 200004: $msg = 'Fail to update app'; break;
+            case 200005: $msg = 'Fail to create role'; break;
+            case 200006: $msg = 'Fail to update role'; break;
+            case 200007: $msg = 'Fail to create department'; break;
+            case 200008: $msg = 'Fail to update department'; break;
             default: $msg = ''; break;
         }
         return ['message'=>$msg, 'code'=>$code];

@@ -258,6 +258,8 @@ class AuthorizeController extends BaseController
             } else {
                 $redata = ['error'=>ErrorMsg::getError(100019)];
             }
+        } else {
+            $redata = ['error'=>ErrorMsg::getError(100005)];
         }
         return $redata;
     }

@@ -37,6 +37,9 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?php TIP('Hello'); ?>, <?php echo getUser('name'); ?> <span class="caret"></span></a>
                     <ul class="dropdown-menu">
+                        <?php if(getAuth()->hasRole('admin')): ?>
+                            <li><a href="/admin/home"><span class="glyphicon glyphicon-cog"></span> <?php TP('Admin'); ?></a></li>
+                        <?php endif; ?>
                         <li><a href="#"><span class="glyphicon glyphicon-user"></span> <?php TP('User Center'); ?></a></li>
                         <li><a href="/auth/password"><span class="glyphicon glyphicon-lock"></span> <?php TP('Change Password'); ?></a></li>
                         <li><a href="/auth/logout"><span class="glyphicon glyphicon-log-out"></span> <?php TP('Logout'); ?></a></li>

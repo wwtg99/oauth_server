@@ -17,6 +17,30 @@ class TokenController extends BaseController
 {
 
     /**
+     * Check access_token and scope.
+     *
+     * @param string $scope
+     * @return array|string: array for error and string for user_id if ok
+     */
+    protected static function check($scope = '')
+    {
+        $re = self::tokenError();
+        if ($re !== false) {
+            return $re;
+        }
+        $token = self::tokenInfo();
+        if ($scope) {
+            $re = self::scopeError($token['scope'], $scope);
+            if ($re !== false) {
+                return $re;
+            }
+        }
+        return $token['user_id'];
+    }
+
+    /**
+     * Check access_token and app_key.
+     *
      * @return array|bool
      * @throws \Exception
      */
@@ -37,6 +61,8 @@ class TokenController extends BaseController
     }
 
     /**
+     * Get authorized info [user_id, scope].
+     *
      * @return array
      */
     protected static function tokenInfo()
@@ -47,6 +73,8 @@ class TokenController extends BaseController
     }
 
     /**
+     * Check scope if is authorized.
+     *
      * @param array|string $scopes
      * @param string $need_scope
      * @return bool|array

@@ -86,6 +86,24 @@ abstract class BaseController
     }
 
     /**
+     * Get Inputs array by name list without null.
+     *
+     * @param array $namelist
+     * @return array
+     */
+    public static function getArrayInputN(array $namelist)
+    {
+        $out = [];
+        foreach ($namelist as $n) {
+            $v = self::getInput($n);
+            if (!is_null($v)) {
+                $out[$n] = $v;
+            }
+        }
+        return $out;
+    }
+
+    /**
      * Check value.
      *
      * @param $val
@@ -116,6 +134,49 @@ abstract class BaseController
     }
 
     /**
+     * Check input exists, return value or error array.
+     *
+     * @param string $name
+     * @param string $message
+     * @param int $code
+     * @return array|string
+     */
+    public static function checkInput($name, $message, $code)
+    {
+        $req = self::getRequest();
+        if (isset($req->data[$name])) {
+            return $req->data[$name];
+        }
+        if (isset($req->query[$name])) {
+            return $req->query[$name];
+        }
+        return ['message'=>$message, 'code'=>$code];
+    }
+
+    /**
+     * Check input exists in namelist or error array.
+     *
+     * @param array $namelist
+     * @param array $message: ['name'=>['message'=>'', 'code'=>''], ...]
+     * @return array|bool
+     */
+    public static function checkInputs(array $namelist, array $message)
+    {
+        foreach ($namelist as $item) {
+            if (array_key_exists($item, $message)) {
+                $msg = $message[$item];
+            } else {
+                $msg = ['message'=>"invalid $item", 'code'=>1];
+            }
+            $re = self::checkInput($item, $msg['message'], $msg['code']);
+            if (is_array($re)) {
+                return $re;
+            }
+        }
+        return true;
+    }
+
+    /**
      * params method1, method2, ...
      * @return bool
      */
@@ -137,5 +198,6 @@ abstract class BaseController
     public static function defaultHeader()
     {
         header('Cache-Control: no-cache');
+        header('Pragma: no-cache');
     }
 } 

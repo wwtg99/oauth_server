@@ -16,26 +16,18 @@ class UserController extends TokenController
 
     public static function info()
     {
-        $err = self::tokenError();
-        if ($err) {
-            \Flight::json($err);
+        $re = self::check('get_user_info');
+        if (is_array($re)) {
+            \Flight::json($re);
             return false;
         } else {
-            $token = self::tokenInfo();
-            if ($token) {
-                $err = self::scopeError($token['scope'], 'get_user_info');
-                if ($err) {
-                    \Flight::json($err);
-                    return false;
-                } else {
-                    $user = Admin::getUser($token['user_id']);
-                    if ($user) {
-                        \Flight::json($user);
-                        return false;
-                    } else {
-                        \Flight::json(['error'=>['message'=>'Invalid user', 'code'=>200000]]);
-                    }
-                }
+            $user = Admin::getUser($re);
+            if ($user) {
+                \Flight::json($user);
+                return false;
+            } else {
+                \Flight::json(['error'=>['message'=>'Invalid user', 'code'=>2]]);
+                return false;
             }
         }
     }
