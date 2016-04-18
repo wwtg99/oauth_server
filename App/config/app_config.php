@@ -9,8 +9,8 @@
 return [
     //Application config
     'app'=>'Flight2wwu_OAuth',
-    'version'=>'0.1.1',
-    'framework_version'=>'0.1.5',
+    'version'=>'0.1.2',
+    'framework_version'=>'0.1.6',
     'author'=>'wwu',
     'description'=>'',
     //Timezone and language
@@ -45,6 +45,7 @@ return [
             'Log' => 'Flight2wwu\Component\Log\Monolog',
 //            'DB' => 'Flight2wwu\Component\Database\PdoDB',
             'DB' => 'Flight2wwu\Component\Database\MedooDB',
+            'ORM' => 'Flight2wwu\Component\Database\OrmManager',
             'Locale' => 'Flight2wwu\Component\Translation\SymTrans',
             'Cache' => 'Flight2wwu\Component\Storage\Cache',
             'Session' => 'Flight2wwu\Component\Storage\SessionUtil',
@@ -211,6 +212,8 @@ return [
         'prefix'=>'oauth',
         'session'=>true, //enable session
         'cookie'=>true, //enable cookie
+        'cookie_path'=>'/', // path for cookies
+        'cookie_domain'=>null, //domain for cookies
         'old_value'=>'session', //storage method for old_value: cache, session
     ],
     //Mail

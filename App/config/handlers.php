@@ -31,8 +31,9 @@ if (isDebug()) {
     getLog()->error(sprintf('Error (%s) message: %s',  $ex->getCode(), $ex->getMessage()));
     getLog()->error($ex->getTraceAsString());
     $m = $ex->getMessage();
-    if (strlen($m) > 50) {
-        $m = substr($m, 0, 50) . '...';
+    $maxl = 100;
+    if (strlen($m) > $maxl) {
+        $m = substr($m, 0, $maxl) . '...';
     }
     $msg = sprintf('<h1>500 Internal Server Error</h1><h3>%s (%s)</h3>', $m, $ex->getCode());
     try {

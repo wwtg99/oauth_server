@@ -31,6 +31,14 @@ function getDB()
 }
 
 /**
+ * @return \Flight2wwu\Component\Database\OrmManager
+ */
+function getORM()
+{
+    return Flight::ORM();
+}
+
+/**
  * @return \Flight2wwu\Component\Log\ILog
  */
 function getLog()

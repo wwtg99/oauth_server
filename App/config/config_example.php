@@ -46,6 +46,7 @@ return [
             'Log' => 'Flight2wwu\Component\Log\Monolog',
 //            'DB' => 'Flight2wwu\Component\Database\PdoDB',
             'DB' => 'Flight2wwu\Component\Database\MedooDB',
+            'ORM' => 'Flight2wwu\Component\Database\OrmManager',
             'Locale' => 'Flight2wwu\Component\Translation\SymTrans',
             'Cache' => 'Flight2wwu\Component\Storage\Cache',
             'Session' => 'Flight2wwu\Component\Storage\SessionUtil',
@@ -204,6 +205,8 @@ return [
         'prefix'=>'fwwu', //prefix for session and cookie, auto add _ after prefix
         'session'=>true, //enable session
         'cookie'=>true, //enable cookie
+        'cookie_path'=>'/', // path for cookies
+        'cookie_domain'=>null, //domain for cookies
         'old_value'=>'session', //storage method for old_value: cache, session
     ],
     //Mail

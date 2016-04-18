@@ -1,6 +1,6 @@
 <div class="container">
     <div class="page-header text-center">
-        <h1><?php TIP('Login'); ?></h1>
+        <h1><?php TIP('Genowise Login'); ?></h1>
     </div>
     <div class="row">
         <?php if(isset($error)): ?>

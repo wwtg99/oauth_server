@@ -19,25 +19,30 @@ trait TNormalAuth
      */
     public static function verify(array $user)
     {
-        $db = getDB();
-        if (array_key_exists('token', $user) && $user['token']) {
-            //unused
-            $u = $db->getConnection('main')->get(User::VIEW_USER, User::$head, ['AND'=>['remember_token'=>$user['token'], 'active'=>'true']]);
-            if ($u) {
-                if (self::verifyToken($user['token'], $u[User::KEY_USER_ID])) {
-                    return ['user_id'=>$u[User::KEY_USER_ID], 'name'=>$u[User::KEY_USER_NAME], 'label'=>$u['label'], 'department'=>$u['department'], 'email'=>$u[User::KEY_USER_EMAIL], 'superuser'=>$u['superuser'], 'descr'=>$u['descr'], 'token'=>$user[User::KEY_USER_TOKEN], 'roles'=>$u['roles']];
-                }
-            }
-        } elseif (array_key_exists('username', $user) && $user['username']) {
-            $u = $db->getConnection('main')->get(User::VIEW_USER, User::$head, ['AND'=>[User::KEY_USER_NAME => $user['username'], 'active' => 'true']]);
+        $db = getDB()->getConnection('main');
+        if (isset($user['username']) && isset($user['password'])) {
+            $u = $db->get(User::VIEW_USER, User::$head,
+                ['AND'=>[User::KEY_USER_NAME => $user['username'], 'deleted_at' => null]]);
             if ($u) {
                 $uid = $u[User::KEY_USER_ID];
                 $pwd = $u[User::KEY_USER_PASSWORD];
-//                $age = $user['remember'] ? 30 : 1;
+                $age = $user['remember'] ? 30 : 1;
+                $u['expires_in'] = $age * 86400;
                 if (is_null($pwd) || $pwd === '' || password_verify($user['password'], $pwd)) {
-//                    $token = self::generateToken($uid, $age);
-//                    self::updateToken($uid, $token);
-                    return ['user_id' => $uid, 'name' => $u[User::KEY_USER_NAME], 'label'=>$u['label'], 'department'=>$u['department'], 'email' => $u[User::KEY_USER_EMAIL], 'superuser' => $u['superuser'], 'descr' => $u['descr'], 'roles'=>$u['roles']];
+                    $token = self::generateToken($uid, $age);
+                    $t = self::updateToken($uid, $token);
+                    if ($t) {
+                        $u[User::KEY_USER_TOKEN] = $token;
+                    }
+                    return $u;
+                }
+            }
+        } elseif (isset($user['username']) && isset($user['token'])) {
+            $u = $db->get(User::VIEW_USER, User::$head,
+                ['AND'=>[User::KEY_USER_TOKEN=>$user['token'], User::KEY_USER_NAME=>$user['username'], 'deleted_at'=>null]]);
+            if ($u) {
+                if (self::verifyToken($user['token'], $u[User::KEY_USER_ID])) {
+                    return $u;
                 }
             }
         }
@@ -91,8 +96,8 @@ trait TNormalAuth
      */
     private static function updateToken($uid, $token)
     {
-        $db = getDB();
-        $re= $db->getConnection('main')->update(User::TABLE_USER, ['remember_token'=>$token], [User::KEY_USER_ID=>$uid]);
+        $db = getDB()->getConnection('main');
+        $re= $db->update(User::TABLE_USER, ['remember_token'=>$token], [User::KEY_USER_ID=>$uid]);
         return $re;
     }
 }

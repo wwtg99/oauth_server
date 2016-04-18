@@ -7,7 +7,7 @@
             <?php
             $msg = getOld('admin_msg');
             if ($msg) {
-                $ac = new \Components\Comp\AlertView('danger');
+                $ac = new \Components\Comp\AlertView($msg['type']);
                 echo $ac->view(['message'=>T($msg['message'])]);
             }
             ?>

@@ -8,8 +8,11 @@
 
 namespace App\Controller;
 
+use App\Model\Admin;
 use App\Model\Auth\User;
+use App\Model\Message;
 use Flight2wwu\Common\BaseController;
+use Flight2wwu\Component\Utils\FormatUtils;
 
 class AuthController extends BaseController
 {
@@ -80,6 +83,15 @@ class AuthController extends BaseController
         }
     }
 
+    public static function user_edit()
+    {
+        if (self::checkMethod('POST')) {
+            AuthController::postEdit();
+        } else {
+            AuthController::getEdit();
+        }
+    }
+
     private static function getlogin()
     {
         if (getAuth()->isLogin()) {
@@ -95,7 +107,7 @@ class AuthController extends BaseController
         $pwd = self::getPost('password');
         $rem = self::getPost('remember');
         getOValue()->addOld('username', $name);
-        if (getAuth()->attempt(['username'=>$name, 'password'=>$pwd, 'remember'=>$rem])) {
+        if (getAuth()->attempt(['username'=>$name, 'password'=>$pwd, 'remember'=>$rem], false)) {
             \Flight::redirect(self::$redirectPath);
         } else {
             getView()->render('auth/login', ['msg'=>'login failed', 'status'=>'danger']);
@@ -147,7 +159,8 @@ class AuthController extends BaseController
 
     private static function getInfo()
     {
-
+        $user = Admin::getUser(getUser('user_id'));
+        getView()->render('auth/user_info', ['user'=>FormatUtils::formatTransArray($user)]);
     }
 
     private static function postInfo()
@@ -163,5 +176,26 @@ class AuthController extends BaseController
     public static function postSignup()
     {
 
+    }
+
+    private static function getEdit()
+    {
+        $user = Admin::getUser(getUser('user_id'));
+        getView()->render('auth/user_edit', ['user'=>$user]);
+    }
+
+    private static function postEdit()
+    {
+        $user = self::getArrayInput(['name', 'label', 'email', 'descr']);
+        $u = getORM()->getModel('Users');
+        $re = $u->update($user, ['user_id'=>getUser('user_id')]);
+        if ($re) {
+            $msg = Message::getMessage(0, 'update successfully', 'success');
+        } else {
+            $msg = Message::getMessage(3);
+        }
+        getOValue()->addOldOnce('user_msg', $msg);
+        $user = Admin::getUser(getUser('user_id'));
+        getView()->render('auth/user_edit', ['user'=>$user]);
     }
 } 

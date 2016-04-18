@@ -16,7 +16,7 @@
         function init_center() {
             var head = <?php echo json_encode($users_head); ?>;
             for (var i in head) {
-                if (head[i]['field'] == 'superuser' || head[i]['field'] == 'active') {
+                if (head[i]['field'] == 'superuser') {
                     head[i]['formatter'] = booleanFormatter;
                 } else if (head[i]['field'] == 'user_id') {
                     head[i]['formatter'] = function(val, row, index) {
@@ -28,8 +28,8 @@
                 field: 'operation',
                 title: '<?php TP('operation'); ?>',
                 formatter: function(val, row, index) {
-                    var opts = ['<button class="btn btn-link del"><?php TP('Delete'); ?></button>'];
-                    if (row['active']) {
+                    var opts = [];//['<button class="btn btn-link del"><?php TP('Delete'); ?></button>'];
+                    if (!row['deleted_at']) {
                         opts.push('<button class="btn btn-link inac"><?php TP('Inactive'); ?></button>');
                     } else {
                         opts.push('<button class="btn btn-link ac"><?php TP('Active'); ?></button>');

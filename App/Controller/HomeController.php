@@ -8,10 +8,8 @@
 
 namespace App\Controller;
 
-use DebugBar\StandardDebugBar;
 use Flight2wwu\Common\BaseController;
-use Flight2wwu\Component\Auth\RoleAuth;
-use Flight2wwu\Component\Log\Monolog;
+use Flight2wwu\Component\Utils\FormatUtils;
 
 class HomeController extends BaseController
 {
@@ -20,7 +18,8 @@ class HomeController extends BaseController
      */
     public static function home()
     {
-        getView()->render('home');
+        getAssets()->addCss('home.css', '/asserts/custom');
+        getView()->render(['center'=>'home', 'foot'=>'']);
     }
 
     /**
@@ -98,5 +97,28 @@ class HomeController extends BaseController
         $md = new \Parsedown();
         $f = file_get_contents(WEB . 'changelog.txt');
         echo $md->text($f);
+    }
+
+    public static function apis()
+    {
+        $api_head = ['uri', 'descr', 'need_scope', 'param'];
+        $apis = [
+            ['uri'=>'/user/info', 'descr'=>'获取用户信息', 'need_scope'=>'get_user_info', 'param'=>null],
+            ['uri'=>'/tool/send_email', 'descr'=>'以no-reply@genowise.com发送邮件', 'need_scope'=>'send_email', 'param'=>'<ul><li>to: 收件人，多个以逗号分隔，必选</li><li>subject: 主题，必选</li><li>body: 正文，支持部分html代码，必选</li><li>cc: 抄送，可选</li><li>bcc: 密送，可选</li></ul>'],
+            ['uri'=>'/tool/express_info', 'descr'=>'查询快递信息', 'need_scope'=>T('open for all'), 'param'=>'<ul><li>company: 快递公司代号，详见<a href="/express_company.txt" target="_blank">列表</a>，必选</li><li>no: 快递单号，必选</li><li>type: 返回类型，默认字符串，可选json</li></ul>'],
+            ['uri'=>'/genobase/marker_map', 'descr'=>'转换marker和GW号', 'need_scope'=>'临时公开', 'param'=>'<ul><li>data: JSON数组格式，如["GWV0000001","GWV0000002"]，必选</li><li>type: 转换类型，1为mutation转GW号（默认），2为GW号转mutation</li></ul>'],
+            ['uri'=>'/genobase/markers', 'descr'=>'获取marker信息', 'need_scope'=>'临时公开', 'param'=>'<ul><li>gwid: GW号，多个以逗号分隔</li><li>mutation: mutation名，多个以逗号分隔</li><li>gene: 基因名，多个以逗号分隔</li></ul>'],
+            ['uri'=>'/pharm/pharmgkb', 'descr'=>'获取PharmGKB数据(POST)', 'need_scope'=>'临时公开', 'param'=>'<ul><li>name: 药物名，多个以逗号分隔，必选</li></ul>'],
+        ];
+        getAssets()->addLibrary(['bootstrap-table']);
+        getView()->render('apis', ['apis'=>$apis, 'api_head'=>FormatUtils::formatHead($api_head)]);
+    }
+
+    public static function document()
+    {
+        $py_readme = file_get_contents(WEB . implode(DIRECTORY_SEPARATOR, ['sdk', 'python', 'README.md']));
+        $php_readme = file_get_contents(WEB . implode(DIRECTORY_SEPARATOR, ['sdk', 'php', 'README.md']));
+        $readme = ['python'=>$py_readme, 'php'=>$php_readme];
+        getView()->render('documents', ['readme'=>$readme]);
     }
 } 

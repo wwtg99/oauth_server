@@ -9,9 +9,9 @@
 namespace App\Controller;
 
 
-use App\Model\App;
 use App\Model\Auth\User;
-use App\Model\ErrorMsg;
+use App\Model\Message;
+use App\Model\Orm\Apps;
 use Flight2wwu\Common\BaseController;
 
 class AuthorizeController extends BaseController
@@ -25,7 +25,7 @@ class AuthorizeController extends BaseController
     /**
      * @var array
      */
-    private static $scopes = ['get_user_info', 'update_user_info'];
+    private static $scopes = ['get_user_info', 'update_user_info', 'send_email'];
 
     public static function authorize()
     {
@@ -58,12 +58,12 @@ class AuthorizeController extends BaseController
             $state = self::getInput('state');
             $scope = self::getInput('scope', 'get_user_info');
             if (!self::checkExists($rurl, null, false)) {
-                $redata = ['error' => ErrorMsg::getError(100010)];
+                $redata = ['error' => Message::getMessage(100010)];
             } else {
                 if ($rtype == 'code') {
                     $redata = self::responseCode($cid, $rurl, $scope, $state);
                 } else {
-                    $err = ErrorMsg::getError(100000);
+                    $err = Message::getMessage(100000);
                     $redata = ['error' => $err];
                 }
             }
@@ -81,18 +81,18 @@ class AuthorizeController extends BaseController
         $rurl = self::getInput('redirect_uri');
         $state = self::getInput('state');
         if (!self::checkExists($rurl, null, false)) {
-            $redata = ['error' => ErrorMsg::getError(100010)];
+            $redata = ['error' => Message::getMessage(100010)];
         } elseif(!self::checkExists($code, null, false)) {
-            $redata = ['error' => ErrorMsg::getError(100005)];
+            $redata = ['error' => Message::getMessage(100005)];
 //        } elseif(!self::checkExists($cid, null, false)) {
-//            $redata = ['error' => ErrorMsg::getError(100001)];
+//            $redata = ['error' => Message::getMessage(100001)];
 //        } elseif(!self::checkExists($cset, null, false)) {
-//            $redata = ['error' => ErrorMsg::getError(100009)];
+//            $redata = ['error' => Message::getMessage(100009)];
         } else {
             if ($gtype == 'authorization_code') {
                 $redata = self::authorizeToken($cid, $cset, $code, $rurl, $state);
             } else {
-                $redata = ['error' => $err = ErrorMsg::getError(100004)];
+                $redata = ['error' => $err = Message::getMessage(100004)];
             }
         }
         \Flight::json($redata);
@@ -126,22 +126,23 @@ class AuthorizeController extends BaseController
             $redata['state'] = $state;
         }
         $redirect_uri = urldecode($redirect_uri);
+        $apps = getORM()->getModel('Apps');
         if ($client_id) {
             //registered app
-            $app = App::show($client_id);
+            $app = $apps->show($client_id);
             if ($app) {
                 $redata['app_id'] = $client_id;
                 $redata['app_name'] = $app['app_name'];
                 $redata['app_descr'] = $app['descr'];
-                if (App::checkRedirectUrl($app['redirect_uri'], $redirect_uri)) {
+                if (Apps::checkRedirectUrl($app['redirect_uri'], $redirect_uri)) {
                     $scope = self::scopes($scope);
                     $redata['scope'] = $scope;
                     $redata['redirect_uri'] = $redirect_uri;
                 } else {
-                    $redata = ['error'=>ErrorMsg::getError(100010)];
+                    $redata = ['error'=>Message::getMessage(100010)];
                 }
             } else {
-                $redata = ['error'=>ErrorMsg::getError(100001)];
+                $redata = ['error'=>Message::getMessage(100001)];
             }
         } else {
             //unregistered app
@@ -150,7 +151,7 @@ class AuthorizeController extends BaseController
                 $redata['scope'] = $scope;
                 $redata['redirect_uri'] = $redirect_uri;
             } else {
-                $redata = ['error'=>ErrorMsg::getError(100008)];
+                $redata = ['error'=>Message::getMessage(100008)];
             }
         }
         return $redata;
@@ -171,27 +172,29 @@ class AuthorizeController extends BaseController
         if ($state) {
             $redata['state'] = $state;
         }
+        $apps = getORM()->getModel('Apps');
         if ($client_id) {
-            $app = App::show($client_id);
+            $app = $apps->show($client_id);
             $redata['app_id'] = $client_id;
             $redata['app_name'] = $app['app_name'];
+            $redata['app_descr'] = $app['descr'];
             if ($app) {
                 //registered app
-                if (App::checkRedirectUrl($app['redirect_uri'], $redirect_uri)) {
-                    $u = User::verify(['username' => $username, 'password' => $password]);
+                if (Apps::checkRedirectUrl($app['redirect_uri'], $redirect_uri)) {
+                    $u = User::verify(['username' => $username, 'password' => $password, 'remember'=>false]);
                     if ($u) {
                         $uid = $u['user_id'];
-                        $url = App::generateCode($uid, $client_id, $redirect_uri, $scope, $state);
+                        $url = $apps->generateCode($uid, $client_id, $redirect_uri, $scope, $state);
                         return $url;
                     } else {
                         $redata['msg'] = 'login failed';
                         $redata['status'] = 'danger';
                     }
                 } else {
-                    $redata = ['error'=>ErrorMsg::getError(100010)];
+                    $redata = ['error'=>Message::getMessage(100010)];
                 }
             } else {
-                $redata = ['error'=>ErrorMsg::getError(100018)];
+                $redata = ['error'=>Message::getMessage(100018)];
             }
         } else {
             //unregistered app
@@ -199,14 +202,14 @@ class AuthorizeController extends BaseController
                 $u = User::verify(['username'=>$username, 'password'=>$password]);
                 if ($u) {
                     $uid = $u['user_id'];
-                    $url = App::generateCode($uid, null, $redirect_uri, $scope, $state);
+                    $url = $apps->generateCode($uid, null, $redirect_uri, $scope, $state);
                     return $url;
                 } else {
                     $redata['msg'] = 'login failed';
                     $redata['status'] = 'danger';
                 }
             } else {
-                $redata = ['error'=>ErrorMsg::getError(100008)];
+                $redata = ['error'=>Message::getMessage(100008)];
             }
         }
         return $redata;
@@ -227,39 +230,40 @@ class AuthorizeController extends BaseController
             $redata['state'] =  $state;
         }
         $c = getCache()->get($code);
+        $apps = getORM()->getModel('Apps');
         getCache()->delete($code);
         if ($c && $c['expires'] >= time()) {
             $scope = $c['scope'];
             $uid = $c['user_id'];
             if (substr($code, 0, 1) == 'R') {
                 //registered app
-                $app = App::show($client_id);
+                $app = $apps->show($client_id);
                 if ($app) {
-                    if (!App::checkRedirectUrl($app['redirect_uri'], $redirect_uri)) {
-                        $redata = ['error' => ErrorMsg::getError(100010)];
+                    if (!Apps::checkRedirectUrl($app['redirect_uri'], $redirect_uri)) {
+                        $redata = ['error' => Message::getMessage(100010)];
                         return $redata;
                     } elseif ($client_secret != $app['app_secret']) {
-                        $redata = ['error' => ErrorMsg::getError(100009)];
+                        $redata = ['error' => Message::getMessage(100009)];
                         return $redata;
                     } else {
-                        $re = App::generateAccessToken($uid, $scope, $client_id);
+                        $re = $apps->generateAccessToken($uid, $scope, $client_id);
                     }
                 } else {
-                    $redata = ['error' => ErrorMsg::getError(100001)];
+                    $redata = ['error' => Message::getMessage(100001)];
                     return $redata;
                 }
             } else {
                 //unregistered app
-                $re = App::generateAccessToken($uid, $scope);
+                $re = $apps->generateAccessToken($uid, $scope);
             }
             if ($re) {
                 $redata['access_token'] = $re['access_token'];
                 $redata['expires_in'] = $re['expires_in'];
             } else {
-                $redata = ['error'=>ErrorMsg::getError(100019)];
+                $redata = ['error'=>Message::getMessage(100019)];
             }
         } else {
-            $redata = ['error'=>ErrorMsg::getError(100005)];
+            $redata = ['error'=>Message::getMessage(100005)];
         }
         return $redata;
     }

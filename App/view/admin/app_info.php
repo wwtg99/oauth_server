@@ -7,7 +7,7 @@
             <?php
             $msg = getOld('admin_msg');
             if ($msg) {
-                $ac = new \Components\Comp\AlertView('danger');
+                $ac = new \Components\Comp\AlertView($msg['type']);
                 echo $ac->view(['message'=>T($msg['message'])]);
             }
             ?>
@@ -18,7 +18,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="txt_name"><?php TP('app_name'); ?></label>
-                    <input class="form-control" name="name" type="text" id="txt_name" required>
+                    <input class="form-control" name="app_name" type="text" id="txt_name" required>
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="txt_uri"><?php TP('redirect_uri'); ?></label>

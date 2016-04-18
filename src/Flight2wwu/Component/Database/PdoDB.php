@@ -64,16 +64,18 @@ class PdoDB implements ServiceProvider
 
     /**
      * @param string $name
+     * @return $this
      */
     public function reconnect($name = 'main')
     {
         $dbconfig = \Flight::get('database');
         if (!$dbconfig || !is_array($dbconfig)) {
             $this->logError(['error'=>'Database is invalid', 'code'=>1]);
-            return;
+            return $this;
         }
         $dbfield = array_key_exists($name, $dbconfig) ? $dbconfig[$name] : $dbconfig['main'];
         $this->connect($dbfield);
+        return $this;
     }
 
     /**

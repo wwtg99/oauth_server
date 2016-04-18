@@ -10,6 +10,7 @@ namespace App\Controller;
 
 
 use App\Model\Admin;
+use App\Model\Message;
 
 class UserController extends TokenController
 {
@@ -26,7 +27,8 @@ class UserController extends TokenController
                 \Flight::json($user);
                 return false;
             } else {
-                \Flight::json(['error'=>['message'=>'Invalid user', 'code'=>2]]);
+                $msg = Message::getMessage(1);
+                \Flight::json(['error'=>$msg]);
                 return false;
             }
         }

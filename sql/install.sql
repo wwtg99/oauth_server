@@ -1,2 +1,3 @@
-\i structures.sql
-\i functions.sql
+\i users.sql
+\i apps.sql
+\i init.sql

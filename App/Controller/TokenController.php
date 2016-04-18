@@ -10,7 +10,7 @@ namespace App\Controller;
 
 
 use App\Model\AccessToken;
-use App\Model\ErrorMsg;
+use App\Model\Message;
 use Flight2wwu\Common\BaseController;
 
 class TokenController extends BaseController
@@ -49,12 +49,12 @@ class TokenController extends BaseController
         $token = self::getInput('access_token');
         $akey = self::getInput('app_key');
         if (!self::checkExists($token, null, false)) {
-            $redata = ['error'=>ErrorMsg::getError(100007)];
+            $redata = ['error'=>Message::getMessage(100007)];
         } else {
             if(AccessToken::verify($token, $akey)) {
                 return false;
             } else {
-                $redata = ['error'=>ErrorMsg::getError(100016)];
+                $redata = ['error'=>Message::getMessage(100016)];
             }
         }
         return $redata;
@@ -87,7 +87,7 @@ class TokenController extends BaseController
         if (in_array($need_scope, $scopes)) {
             return false;
         } else {
-            return ['error'=>ErrorMsg::getError(100023)];
+            return ['error'=>Message::getMessage(100023)];
         }
     }
 }

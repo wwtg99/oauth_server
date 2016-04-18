@@ -1,7 +1,7 @@
-INSERT INTO departments (department_id, name) VALUES ('TS', 'Test');
-SELECT create_role('admin', 'Administrator');
-SELECT create_role('common_user', 'Common User');
-SELECT create_user('admin', 'GW', 'admin');
-UPDATE users SET superuser = TRUE WHERE user_id = get_user_id('admin');
-SELECT add_role(get_user_id('admin'), get_role_id('admin'));
-SELECT create_app('test_app', 'test', '192.168.0.21');
+INSERT INTO public.departments (department_id, name, descr) VALUES ('GW', 'Genowise', 'Genowise');
+INSERT INTO public.roles (name, descr) VALUES ('admin', 'Administrator');
+INSERT INTO public.roles (name, descr) VALUES ('common_user', 'Common');
+INSERT INTO public.users (name, label, department_id, descr) VALUES ('admin', 'admin', 'GW', 'Administrator');
+SELECT public.add_user_role(get_user_id('admin'), get_role_id('admin'));
+
+INSERT INTO public.apps (app_name, descr, redirect_uri) VALUES ('test1', 'test', 'localhost');

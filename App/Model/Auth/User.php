@@ -26,7 +26,7 @@ class User
     const TABLE_USER = 'users';
     const VIEW_USER = 'view_users';
 
-    public static $head = [User::KEY_USER_ID, User::KEY_USER_NAME, User::KEY_USER_PASSWORD, User::KEY_USER_EMAIL, 'label', 'department_id', 'department', 'descr', 'superuser', 'roles', 'created_at'];
+    public static $head = '*';
 
     /**
      * @param $old

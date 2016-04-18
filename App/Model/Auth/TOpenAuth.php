@@ -15,6 +15,12 @@ use Purl\Url;
 
 trait TOpenAuth
 {
+
+    /**
+     * @var string
+     */
+    private static $userInfoPath = 'http://192.168.0.21:10000/user/info';
+
     /**
      * @param array $user
      * @return array|bool
@@ -25,7 +31,7 @@ trait TOpenAuth
             $token = $user['token'];
             $u = self::getUser($token);
             if ($u && !array_key_exists('error', $u)) {
-                $u['token'] = $token;
+                $u[User::KEY_USER_TOKEN] = $token;
                 if (array_key_exists('expires_in', $user)) {
                     $u['expires_in'] = $user['expires_in'];
                 }
@@ -130,8 +136,7 @@ trait TOpenAuth
      */
     private static function getUser($token)
     {
-        $uri = 'http://192.168.0.21:10000/user/info';
-        $res = self::getResource($uri, $token);
+        $res = self::getResource(self::$userInfoPath, $token);
         return $res;
     }
 
