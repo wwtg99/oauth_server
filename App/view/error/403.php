@@ -6,7 +6,7 @@
     </div>
     <br><br><br>
     <div>
-        <button class="ui primary button" onclick="location.href='/auth/login';"><?php TP('Login'); ?></button>
-        <button class="ui button" onclick="toHome();"><?php TP('Return'); ?></button>
+        <button class="btn btn-primary" onclick="location.href='/auth/login';"><?php TP('Login'); ?></button>
+        <button class="btn btn-default" onclick="toHome();"><?php TP('Return'); ?></button>
     </div>
 </div>

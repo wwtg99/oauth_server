@@ -9,6 +9,8 @@
 namespace Flight2wwu\Schedule;
 
 
+use Flight2wwu\Component\Utils\FormatUtils;
+
 class ScheduleManager {
 
     const LOCK_FILE = 'schedule.lock';
@@ -122,7 +124,7 @@ class ScheduleManager {
     public function enableService()
     {
         if ($this->support == 'crontab') {
-            $cont = $this->time . ' php ' . realpath(ROOT) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . $this->engine . "\n";
+            $cont = $this->time . ' php ' . FormatUtils::formatPathArray([realpath(ROOT), 'bin', $this->engine]) . "\n";
             $f = TMP . 'crontab';
             file_put_contents($f, $cont);
             exec("crontab $f");

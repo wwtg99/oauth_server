@@ -51,6 +51,7 @@
                 </div>
                 <button class="btn btn-primary" type="submit"><?php TP('Submit'); ?></button>
                 <button class="btn btn-default" type="reset"><?php TP('Reset'); ?></button>
+                <button class="btn btn-default" type="button" id="bt_reset_pwd"><?php TP('Reset Password'); ?></button>
                 <a href="/admin/users" class="btn btn-default" type="button"><?php TP('Return'); ?></a>
             </form>
         </div>
@@ -67,6 +68,7 @@
             $('.ch_roles').on('ifChanged', changeRoles);
             <?php if(isset($user_id)): ?>
             loadForm(<?php echo json_encode($user); ?>);
+            $('#bt_reset_pwd').click(reset_pwd);
             <?php else: ?>
             $('#lb_id').hide();
             $('#txt_id').hide();
@@ -105,6 +107,23 @@
             }
             window.roles = _.uniq(window.roles);
             $('#txt_roles').val(window.roles.join(','));
+        }
+
+        function reset_pwd() {
+            var user_id = '<?php echo isset($user_id) ? $user_id: ''; ?>';
+            BootstrapDialog.confirm('<?php TP('confirm to reset password') ?>', function(result) {
+                if (result) {
+                    var url = '/admin/reset_pwd';
+                    var pdata = {user_id: user_id};
+                    $.post(url, pdata, function (data) {
+                        if (data['result']) {
+                            BootstrapDialog.alert('<?php TP('reset successfully') ?>');
+                        } else {
+                            BootstrapDialog.alert('<?php TP('reset failed') ?>');
+                        }
+                    });
+                }
+            });
         }
     </script>
 </div>

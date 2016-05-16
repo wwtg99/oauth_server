@@ -42,6 +42,12 @@ interface IAuth
     public function getUser();
 
     /**
+     * @param array $user
+     * @return array
+     */
+    public function refreshUser($user);
+
+    /**
      * @param string|array $role
      * @return bool
      */

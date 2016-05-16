@@ -34,7 +34,30 @@ class FormatUtils
      */
     public static function formatPath($path)
     {
-        return (trim($path) && $path != DIRECTORY_SEPARATOR) ? rtrim(trim($path), DIRECTORY_SEPARATOR) : '';
+        if ($path == DIRECTORY_SEPARATOR) {
+            return $path;
+        }
+        return trim($path) ? rtrim(trim($path), DIRECTORY_SEPARATOR) : '';
+    }
+
+    /**
+     * @param array $paths
+     * @return string
+     */
+    public static function formatPathArray(array $paths)
+    {
+        $arr = [];
+        for ($i = 0; $i < count($paths); $i++) {
+            $p = self::formatPath($paths[$i]);
+            if ($i == 0 && $p == DIRECTORY_SEPARATOR) {
+                array_push($arr, '');
+            } elseif ($p === '') {
+                continue;
+            } else {
+                array_push($arr, $p);
+            }
+        }
+        return implode(DIRECTORY_SEPARATOR, $arr);
     }
 
     /**

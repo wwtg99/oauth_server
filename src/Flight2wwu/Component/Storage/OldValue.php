@@ -36,6 +36,14 @@ class OldValue implements ServiceProvider
     public function boot()
     {
         $conf = \Flight::get('storage');
+        $this->loadConfig($conf);
+    }
+
+    /**
+     * @param array $conf
+     */
+    public function loadConfig(array $conf)
+    {
         if (isset($conf['old_value'])) {
             $method = $conf['old_value'];
             switch(strtolower($method)) {

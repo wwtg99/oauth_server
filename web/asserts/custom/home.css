@@ -1,0 +1,35 @@
+body {
+    background: #ffffff url('/asserts/images/bg1.png') no-repeat;
+    background-size: 100% 100%;
+}
+
+body .border_body {
+    height: 92vh;
+    padding: 0;
+    margin: 0;
+}
+
+body .border_foot {
+    margin: 0;
+}
+
+.logo img {
+    height: 200px;
+}
+
+.tools {
+    position: fixed;
+    right: 40px;
+    bottom: 10vh;
+    z-index: 100;
+}
+
+.border_head .navbar-default {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+/*font*/
+.font12 {
+    font-size: 12px;
+}

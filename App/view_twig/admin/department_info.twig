@@ -1,0 +1,47 @@
+{% extends"admin/home.twig" %}
+{% block title %}{{ 'Department Management'|T }}{% endblock %}
+{% block sidenav_0 %}{% endblock %}
+{% block sidenav_1 %}active{% endblock %}
+{% block center %}
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            {% set m = old('admin_msg') %}
+            {% if m %}
+                {{ component('alert', {'level': m.type, 'data': {'message': m.message|T}}) }}
+            {% endif %}
+            <form class="form" role="form" id="form_department" method="post" action="/admin/add_department">
+                <div class="form-group">
+                    <label class="control-label" for="txt_id" id="lb_id">{{ 'department_id'|T }}</label>
+                    <input class="form-control" name="department_id" type="text" id="txt_id" required>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txt_name">{{ 'name'|T }}</label>
+                    <input class="form-control" name="name" type="text" id="txt_name" required>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txt_descr">{{ 'descr'|T }}</label>
+                    <input class="form-control" name="descr" type="text" id="txt_descr">
+                </div>
+                <input name="new" id="txt_new" type="hidden" value="1">
+                <button class="btn btn-primary" type="submit">{{ 'Submit'|T }}</button>
+                <button class="btn btn-default" type="reset">{{ 'Reset'|T }}</button>
+                <a href="/admin/departments" class="btn btn-default" type="button">{{ 'Return'|T }}</a>
+            </form>
+        </div>
+    </div>
+    <script>
+        function init_center() {
+            {% if department_id is defined %}
+            loadForm({{ department|J }});
+            $('#txt_new').val('');
+            {% endif %}
+        }
+
+        function loadForm(department) {
+            $('#txt_id').val(department['department_id']);
+            $('#txt_id').prop('readonly', 1);
+            $('#txt_name').val(department['name']);
+            $('#txt_descr').val(department['descr']);
+        }
+    </script>
+{% endblock %}

@@ -43,9 +43,12 @@ class Mail implements ServiceProvider
      */
     private $date;
 
+    /**
+     * Mail constructor.
+     */
     function __construct()
     {
-
+        $this->loadConfig([]);
     }
 
     /**
@@ -66,11 +69,21 @@ class Mail implements ServiceProvider
     public function boot()
     {
         $conf = \Flight::get('mail');
-        if ($conf) {
+        $this->loadConfig($conf);
+    }
+
+    /**
+     * @param array $conf
+     */
+    public function loadConfig(array $conf)
+    {
+        $method = 'mail';
+        $params = [];
+        if ($conf && is_array($conf)) {
             $method = isset($conf['method']) ? $conf['method'] : 'mail';
             $params = isset($conf['params']) ? $conf['params'] : [];
-            $this->mailer = self::getMail($method, $params);
         }
+        $this->mailer = self::getMail($method, $params);
     }
 
     /**

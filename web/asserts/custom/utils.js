@@ -40,17 +40,11 @@
             if (!opts.hasOwnProperty('context')) {
                 opts['context'] = $(this);
             }
-            $.ajax(opts).done(opts.done_func).fail(opts.fail_func);
+            $.ajax(opts);
         }
     });
     var loadContentDefault = {
-        done_func:  function (data, textStatus, jqXHR) {
-            $(this).html(data);
-        },
-        fail_func: function (jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
-            console.log('status: ' + textStatus);
-        }
+
     };
 }(jQuery));
 
@@ -154,7 +148,8 @@ function getJsonLength(jsonData){
  */
 function postDirect(url, pdata, new_window)
 {
-    var form = $("<form method='post' id='pform' class='hidden'></form>");
+    var id = 'form_' + new Date().getTime();
+    var form = $("<form method='post' id='" + id + "' class='hidden'></form>");
     form.attr({"action":url});
     if (new_window) {
         form.prop('target', '_blank');
@@ -162,14 +157,14 @@ function postDirect(url, pdata, new_window)
     for (var arg in pdata)
     {
         var input = $("<input type='hidden'>");
-        input.attr({"name":arg});
+        input.attr({"name": arg});
         input.val(pdata[arg]);
         form.append(input);
     }
-    var bt_submit = $('<input type="submit" id="pform_submit">');
+    var bt_submit = $('<input type="submit" id="' + id + '_submit">');
     form.append(bt_submit);
     $(document.body).append(form);
-    $('#pform_submit').click();
+    $('#' + id + '_submit').click();
 }
 
 

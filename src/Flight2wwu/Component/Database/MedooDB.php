@@ -11,6 +11,11 @@ namespace Flight2wwu\Component\Database;
 
 use Flight2wwu\Common\ServiceProvider;
 
+/**
+ * Class MedooDB
+ * @package Flight2wwu\Component\Database
+ * @deprecated will be removed later
+ */
 class MedooDB implements ServiceProvider
 {
 

@@ -21,9 +21,9 @@ class ComponentTester extends PHPUnit_Framework_TestCase
         $trans->addResource('zh_CN', 'messages');
         $re = $trans->trans('page not found');
         $this->assertEquals('您访问的页面不存在！', $re);
-        $re = $trans->transi('not login');
+        $re = $trans->trans('not login', [], true);
         $this->assertEquals('您尚未登录！', $re);
-        $re = $trans->transi('Not Login');
+        $re = $trans->trans('Not Login', [], true);
         $this->assertEquals('您尚未登录！', $re);
         $data = ['a'=>'page not found', 'b'=>['c'=>'not login', 'd'=>'login failed']];
         $re = $trans->transArray($data);
@@ -33,29 +33,9 @@ class ComponentTester extends PHPUnit_Framework_TestCase
         $this->assertEquals('Fail to login!', $re);
     }
 
-    public function testValidation()
-    {
-        $b = Respect\Validation\Validator::numeric()->validate('123');
-        $this->assertTrue($b);
-        $v = Respect\Validation\Validator::string()->regex('/a.g/');
-        $arrv = Respect\Validation\Validator::key('name', $v);
-        $b = $arrv->validate(['name'=>'avg']);
-        $this->assertTrue($b);
-        $b = $arrv->validate(['name'=>'sef']);
-        $this->assertFalse($b);
-        $b = $arrv->validate(['value'=>'asg']);
-        $this->assertFalse($b);
-    }
-
-    public function testMarkdown()
-    {
-        $pd = new Parsedown();
-        echo $pd->text("#h1\n##h2");
-    }
-
     public function testCache()
     {
-        $cache = new \Flight2wwu\Component\Session\Cache();
+        $cache = new \Flight2wwu\Component\Storage\Cache();
         $cache->register();
         $cache->boot();
         $data = ['aa'=>'aaa', 'k1'=>'ggg', 'k2'=>['ga', 'ha']];
@@ -67,29 +47,21 @@ class ComponentTester extends PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGuzzle()
-    {
-        $headers = ['Cookie'=>'USER_TOKEN=VTAwMDAwMjU7OjoxOzE0NTIxMzYzNzc%3D'];
-//        $headers = [];
-        $client = new \GuzzleHttp\Client(['base_uri' => 'http://localhost:8070', 'headers'=>$headers]);
-        $res = $client->get('/view');
-        $body = $res->getBody();
-        echo $body;
-    }
-
     public function testRbac()
     {
         $rbac = new \Flight2wwu\Component\Auth\RoleAuth();
-        $rbac->loadRBAC([
-            'admin'=>['*'=>3],
-            'common_user'=>[
-                '*'=>0,
-                '/view/*'=>3,
-                '/tran'=>1
-            ],
-            'test1'=>[
-                '/tran'=>2,
-                '/view/test/*'=>2
+        $rbac->loadConfig([
+            'rbac'=>[
+                'admin'=>['*'=>3],
+                'common_user'=>[
+                    '*'=>0,
+                    '/view/*'=>3,
+                    '/tran'=>1
+                ],
+                'test1'=>[
+                    '/tran'=>2,
+                    '/view/test/*'=>2
+                ]
             ]
         ]);
         $a = $rbac->getRoleAuth('admin', '*');
@@ -126,7 +98,7 @@ class ComponentTester extends PHPUnit_Framework_TestCase
 
     public function testMail()
     {
-        $mail = \Flight2wwu\Component\Utils\Mail::getMail();
+        $mail = new \Flight2wwu\Component\Utils\Mail();
         $re = $mail->send([
             'subject'=>'test',
             'from'=>['test@flight2wwu.com'],
@@ -145,7 +117,16 @@ class ComponentTester extends PHPUnit_Framework_TestCase
             '1200878623037'=>'yd',
             '199130201363'=>'sf'
         ];
-        $exp = Flight::Express();
+        $exp = new \Flight2wwu\Component\Utils\Express();
+        $config = [
+            ['yto', '圆通', 'http://www.kiees.cn/yto.php?wen=<no>&action=ajax', 'extractKieesTable'],
+            ['sto', '申通', 'http://www.kiees.cn/sto.php?wen=<no>&ajax=1', 'extractKieesTable'],
+            ['ems', 'EMS', 'http://www.kiees.cn/ems.php?wen=<no>&action=ajax', 'extractKieesTable'],
+            ['sf', '顺风', 'http://www.kiees.cn/sf.php?wen=<no>&action=ajax', 'extractKieesTable'],
+            ['zto', '中通', 'http://www.kiees.cn/zto.php?wen=<no>&action=ajax', 'extractKieesTable'],
+            ['yd', '韵达', 'http://www.kiees.cn/yd.php?wen=<no>&channel', 'extractKieesTable'],
+        ];
+        $exp->loadConfig($config);
         foreach ($test as $no => $com) {
             $arr = $exp->track($com, $no);
             $last = $exp->current($com, $no);

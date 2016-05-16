@@ -8,10 +8,15 @@
 
 namespace Flight2wwu\Plugin;
 
-
+/**
+ * Class ARunPlugin
+ * @package Flight2wwu\Plugin
+ */
 abstract class ARunPlugin implements IPlugin
 {
     /**
+     * Call method by the first parameter, and other parameters in an array as arguments
+     *
      * @return mixed|null
      */
     public function run()

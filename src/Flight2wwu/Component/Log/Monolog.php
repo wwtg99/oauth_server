@@ -9,6 +9,7 @@
 namespace Flight2wwu\Component\Log;
 
 use Flight2wwu\Common\ServiceProvider;
+use Flight2wwu\Component\Utils\FormatUtils;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 
@@ -26,6 +27,11 @@ class Monolog implements ILog, ServiceProvider
     private $current = 'main';
 
     /**
+     * @var string
+     */
+    private $logDir = '';
+
+    /**
      * Called after register.
      *
      * @return void
@@ -33,10 +39,12 @@ class Monolog implements ILog, ServiceProvider
     public function register()
     {
         $configs = \Flight::get('log');
-        foreach ($configs as $d => $con) {
-            $this->registerLogger($d, $con);
+        $this->logDir = FormatUtils::formatPath($configs['directory']);
+        if (isset($configs['loggers'])) {
+            foreach ($configs['loggers'] as $d => $con) {
+                $this->registerLogger($d, $con);
+            }
         }
-        $this->current = 'main';
     }
 
     /**
@@ -67,7 +75,7 @@ class Monolog implements ILog, ServiceProvider
             $level = self::getLevel($level);
             $name = array_key_exists('title', $config) ? $config['title'] : "$domain.log";
             $max = array_key_exists('max_logfile', $config) ? $config['max_logfile'] : 10;
-            $handler = new RotatingFileHandler(LOG . $name, $max, $level, true, 0777);
+            $handler = new RotatingFileHandler($this->logDir . DIRECTORY_SEPARATOR . $name, $max, $level, true, 0777);
             $logger->pushHandler($handler);
             $this->loggers[$domain] = $logger;
             $this->current = $domain;

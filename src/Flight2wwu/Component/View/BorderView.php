@@ -9,6 +9,8 @@
 namespace Flight2wwu\Component\View;
 
 
+use Flight2wwu\Component\Utils\FormatUtils;
+
 class BorderView extends AbstractView
 {
     /**
@@ -42,18 +44,37 @@ class BorderView extends AbstractView
     private $layoutTemplate = '';
 
     /**
+     * @var string
+     */
+    private $view_root;
+
+    /**
      * Called after all class is registered.
      *
      * @return void
      */
     public function boot()
     {
+        $view = \Flight::get('view');
+        $this->loadConfig($view);
         $this->head = 'border_head';
         $this->foot = 'border_foot';
         $this->left = 'border_left';
         $this->right = 'border_right';
         $this->center = 'border_center';
         $this->layoutTemplate = 'border_layout';
+    }
+
+    /**
+     * @param array $conf
+     */
+    public function loadConfig($conf)
+    {
+        $dir = isset($conf['view_dir']) ? FormatUtils::formatPath($conf['view_dir']) : '';
+        if ($dir && file_exists($dir)) {
+            $this->view_root = $dir;
+            \Flight::set('flight.views.path', $dir);
+        }
     }
 
     /**
@@ -218,9 +239,9 @@ class BorderView extends AbstractView
         }
         $temp = $this->getTemplate($template);
         if ($temp[0]) {
-            \Flight::view()->path = VIEW . $temp[0];
+            \Flight::view()->path = FormatUtils::formatPathArray([$this->view_root, $temp[0]]);
             \Flight::render($temp[1], $data, $key);
-            \Flight::view()->path = VIEW;
+            \Flight::view()->path = $this->view_root;
         } else {
             \Flight::render($temp[1], $data, $key);
         }

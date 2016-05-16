@@ -34,8 +34,8 @@ abstract class OrmModel
         if (is_null($select)) {
             $select = '*';
         }
-        $db = getDB();
-        $re = $db->getConnection()->get($this->getTableName(), $select, $where);
+        $db = getDB()->getConnection();
+        $re = $db->get($this->getTableName(), $select, $where);
         if ($re) {
             return $re;
         }
@@ -51,7 +51,7 @@ abstract class OrmModel
      */
     public function lists($select = null, $where = null, $page = null)
     {
-        $db = getDB();
+        $db = getDB()->getConnection();
         if (is_null($select)) {
             $select = '*';
         }
@@ -64,7 +64,7 @@ abstract class OrmModel
         if ($page instanceof Pagination) {
             $where['LIMIT'] = [$page->getOffset(), $page->getLimit()];
         }
-        $re = $db->getConnection()->select($this->getTableName(), $select, $where);
+        $re = $db->select($this->getTableName(), $select, $where);
         if ($re) {
             return $re;
         }
@@ -78,8 +78,8 @@ abstract class OrmModel
      */
     public function count($where = null)
     {
-        $db = getDB();
-        $re = $db->getConnection()->count($this->getTableName(), $where);
+        $db = getDB()->getConnection();
+        $re = $db->count($this->getTableName(), $where);
         return $re;
     }
 
@@ -91,8 +91,8 @@ abstract class OrmModel
      */
     public function update(array $data, array $where)
     {
-        $db = getDB();
-        $re = $db->getConnection()->update($this->getTableName(), $data, $where);
+        $db = getDB()->getConnection();
+        $re = $db->update($this->getTableName(), $data, $where);
         return $re;
     }
 
@@ -103,8 +103,8 @@ abstract class OrmModel
      */
     public function insert(array $data)
     {
-        $db = getDB();
-        $re = $db->getConnection()->insert($this->getTableName(), $data);
+        $db = getDB()->getConnection();
+        $re = $db->insert($this->getTableName(), $data);
         return $re;
     }
 
@@ -116,8 +116,8 @@ abstract class OrmModel
     public function delete($key)
     {
         $where = $this->formatKey($key);
-        $db = getDB();
-        $re = $db->getConnection()->delete($this->getTableName(), $where);
+        $db = getDB()->getConnection();
+        $re = $db->delete($this->getTableName(), $where);
         return $re;
     }
 
@@ -158,8 +158,8 @@ abstract class OrmModel
         if ($page instanceof Pagination) {
             $where['LIMIT'] = [$page->getOffset(), $page->getLimit()];
         }
-        $db = getDB();
-        $re = $db->getConnection()->select($this->getTableName(), $select, $where);
+        $db = getDB()->getConnection();
+        $re = $db->select($this->getTableName(), $select, $where);
         if ($re) {
             return $re;
         }
@@ -195,24 +195,25 @@ abstract class OrmModel
 
     /**
      * @param string|array $key
-     * @return array|null
+     * @return array
+     * @throws \Exception
      */
     protected function formatKey($key)
     {
         $tkey = $this->getTableKey();
         if (!$tkey) {
-            return null;
+            throw new \Exception('no key found');
         } elseif (is_array($tkey) && is_array($key)) {
             foreach ($tkey as $item) {
                 if (!array_key_exists($item, $key)) {
-                    return null;
+                    return [$tkey => null];
                 }
             }
             return ['AND' => $key];
         } elseif (is_string($tkey) && is_string($key)) {
             return ['AND' => [$tkey => $key]];
         } else {
-            return null;
+            return [$tkey => null];
         }
     }
 }

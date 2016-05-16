@@ -14,86 +14,14 @@ return [
     'version'=>'0.1.0',
     'author'=>'wwu',
     'description'=>'',
+    'framework_version'=>'0.1.10',
     //Timezone and language
     'timezone'=>'Asia/Shanghai',
     'language'=>'zh_CN',
     //Debug
     'debug'=>1,
-    //Config files
-    'config'=>[
-        /**
-         * Register classes
-         * [prefix, path, <recursive>]
-         * prefix for namespace
-         * path is relative to project root
-         * recursive default is false, true to register all subdirectories with first letter uppercase
-         */
-        'register_path'=>[
-            ['Flight2wwu', 'src' . DIRECTORY_SEPARATOR . 'Flight2wwu', true],
-            ['App\Controller', 'App' . DIRECTORY_SEPARATOR . 'Controller', true],
-            ['App\Model', 'App' . DIRECTORY_SEPARATOR . 'Model', true],
-            ['App\Plugin', 'App' . DIRECTORY_SEPARATOR . 'Plugin', true],
-            ['App\Schedule', 'App' . DIRECTORY_SEPARATOR . 'Schedule', true],
-        ],
-        /**
-         * Register class to Flight, Flight();:name to use
-         * name => full class name
-         * Class must implement ServiceProvider
-         */
-        'register_class'=>[
-            'Auth' => 'Flight2wwu\Component\Auth\RoleAuth',
-            'View' => 'Flight2wwu\Component\View\BorderView',
-            'Log' => 'Flight2wwu\Component\Log\Monolog',
-//            'DB' => 'Flight2wwu\Component\Database\PdoDB',
-            'DB' => 'Flight2wwu\Component\Database\MedooDB',
-            'ORM' => 'Flight2wwu\Component\Database\OrmManager',
-            'Locale' => 'Flight2wwu\Component\Translation\SymTrans',
-            'Cache' => 'Flight2wwu\Component\Storage\Cache',
-            'Session' => 'Flight2wwu\Component\Storage\SessionUtil',
-            'Cookie' => 'Flight2wwu\Component\Storage\CookieUtil',
-            'Value' => 'Flight2wwu\Component\Storage\OldValue',
-            'Assets' => 'Flight2wwu\Component\View\AssetsManager',
-            'Mail' => 'Flight2wwu\Component\Utils\Mail',
-            'Express' => 'Flight2wwu\Component\Utils\Express',
-        ],
-        /**
-         * Register route here
-         * All path will be registered in sequence
-         */
-        'route'=>[
-            /**
-             * Route path for functions
-             * [route, array(full class name, function name)]
-             */
-            'path'=>[
-                ["*", array('\\App\\Controller\\HomeController', 'rbac')],
-                ["*", array('\\App\\Controller\\HomeController', 'language')],
-                ["/", array('\\App\\Controller\\HomeController', 'home')],
-                ["/home", array('\\App\\Controller\\HomeController', 'home')],
-                ["/403", array('\\App\\Controller\\HomeController', 'forbidden')],
-                ["/changelog", array('\\App\\Controller\\HomeController', 'changelog')],
-            ],
-            /**
-             * Register whole controller class with static public functions
-             * full class name (without Controller) => prefix
-             * All public static functions will register routes by /prefix/function
-             * Controller must extends BaseController
-             */
-            'controller'=>[
-                'App\Controller\Auth'=>'auth',
-                'App\Controller\OAuth'=>'oauth',
-                'App\Controller\Admin'=>'admin',
-            ],
-            /**
-             * Other route definition file
-             */
-            'file'=>CONFIG . 'route.php',
-        ],
-        /**
-         * Other handler functions
-         */
-        'handler'=>CONFIG . 'handlers.php',
-    ],
+    //Maintenance
+    'maintain'=>0,
     //Plugin
     'plugin'=>[
         'config'=>CONFIG . 'plugins.json'
@@ -107,20 +35,23 @@ return [
     ],
     //Log
     'log'=>[
-        'main'=>[
-            'title'=>'main.log',
-            'max_logfile'=>10,
-            'level'=>'debug'
-        ],
-        'access'=>[
-            'title'=>'access.log',
-            'max_logfile'=>30,
-            'level'=>'info'
-        ],
-        'database'=>[
-            'title'=>'database.log',
-            'max_logfile'=>5,
-            'level'=>'debug'
+        'directory'=>STORAGE . 'log',
+        'loggers'=>[
+            'main'=>[
+                'title'=>'main.log',
+                'max_logfile'=>10,
+                'level'=>'debug'
+            ],
+            'access'=>[
+                'title'=>'access.log',
+                'max_logfile'=>30,
+                'level'=>'info'
+            ],
+            'database'=>[
+                'title'=>'database.log',
+                'max_logfile'=>5,
+                'level'=>'debug'
+            ]
         ]
     ],
     //Database
@@ -132,11 +63,15 @@ return [
             'user'=>'user',
             'password'=>'1',
             'port'=>5432
-        ]
+        ],
+        'backup_directory'=>STORAGE . 'backup'
     ],
     //View
     'assets'=>[
         'lib_conf'=>CONFIG . 'ui_libs.php'
+    ],
+    'view'=>[
+        'view_dir'=>APP . 'view',
     ],
     //Auth
     'auth'=>[
@@ -157,14 +92,17 @@ return [
          */
         'rbac'=>[
             'anonymous'=>[
+                '*' => 0,
                 '/' => 3,
                 '/403' => 3,
                 '/auth/login' => 3,
                 '/auth/logout' => 3,
                 '/oauth/login' => 3,
+                '/oauth/redirect_login' => 3,
             ],
             'admin' => [
-                '*' => 3
+                '*' => 3,
+                '/admin/*' => 3,
             ],
             'common_user' => [
                 '*' => 0,
@@ -185,7 +123,7 @@ return [
     'oauth'=>[
         'code_uri'=>'http://192.168.0.21:10000/authorize',
         'token_uri'=>'http://192.168.0.21:10000/token',
-        'redirect_uri'=>'http://localhost:8880',
+        'redirect_uri'=>'http://localhost:8880/oauth/redirect_login',
         'redirect_uri_key'=>'redirect_uri',
         'app_id'=>'',
         'app_id_key'=>'client_id',

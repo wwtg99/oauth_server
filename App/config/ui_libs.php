@@ -28,7 +28,7 @@ return [
         'prefix'=>'/asserts/custom'
     ],
     'jquery'=>[
-        'js'=>'jquery-1.12.0.min.js',
+        'js'=>'jquery-1.12.3.min.js',
         'prefix'=>'/asserts/jquery'
     ],
     'uploader'=>[
@@ -90,5 +90,18 @@ return [
         'css'=>'buttons.min.css',
         'js'=>'button.js',
         'prefix'=>'/asserts/buttons'
+    ],
+    'qtip'=>[
+        'css'=>'jquery.qtip.min.css',
+        'js'=>'jquery.qtip.min.js',
+        'prefix'=>'/asserts/qtip'
+    ],
+    'peity'=>[
+        'js'=>'jquery.peity.min.js',
+        'prefix'=>'/asserts/peity'
+    ],
+    'echarts'=>[
+        'js'=>'echarts.min.js',
+        'prefix'=>'/asserts/echarts'
     ],
 ];

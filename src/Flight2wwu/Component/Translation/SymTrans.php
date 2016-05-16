@@ -9,6 +9,7 @@
 namespace Flight2wwu\Component\Translation;
 
 use Flight2wwu\Common\ServiceProvider;
+use Flight2wwu\Component\Utils\FormatUtils;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
@@ -61,7 +62,7 @@ class SymTrans implements ServiceProvider, ITranslator
      */
     public function setPath($path)
     {
-        $this->path = rtrim(trim($path), DIRECTORY_SEPARATOR);
+        $this->path = FormatUtils::formatPath($path);
     }
 
     /**
@@ -148,7 +149,7 @@ class SymTrans implements ServiceProvider, ITranslator
         } else {
             $domain = substr($domain, 0, strlen($domain) - 4);
         }
-        $file = implode(DIRECTORY_SEPARATOR, [$this->path, $locale, $resource]);
+        $file = FormatUtils::formatPathArray([$this->path, $locale, $resource]);
         if (file_exists($file)) {
             $re = include "$file";
             $this->translator->addResource('array', $re, $locale, $domain);

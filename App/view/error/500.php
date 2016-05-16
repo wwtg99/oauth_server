@@ -7,6 +7,6 @@
     </p>
     <br><br><br>
     <div>
-        <button class="ui button" onclick="toHome();"><?php TP('Return'); ?></button>
+        <button class="btn btn-default" onclick="toHome();"><?php TP('Return'); ?></button>
     </div>
 </div>

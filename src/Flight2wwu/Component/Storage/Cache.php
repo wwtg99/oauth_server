@@ -42,17 +42,23 @@ class Cache implements ServiceProvider, IAttribute
         $conf = \Flight::get('storage');
         if (isset($conf['cache'])) {
             $conf = $conf['cache'];
+            $this->loadConfig($conf);
+        }
+    }
+
+    /**
+     * @param array $conf
+     * @throws Exception
+     */
+    public function loadConfig(array $conf)
+    {
+        if ($conf && is_array($conf)) {
             if (isset($conf['adapter']) && isset($conf['params'])) {
                 $adapter = $conf['adapter'];
                 $params = $conf['params'];
                 $this->initAdapter($adapter, $params);
             }
         }
-    }
-
-    function __construct()
-    {
-
     }
 
     /**

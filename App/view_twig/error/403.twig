@@ -1,0 +1,15 @@
+{% extends "layout.twig" %}
+{% block center %}
+    <div class="center_align">
+        <h1>{{ 'authentication failed'|T }}</h1>
+        <br>
+        <div>
+            <h5>{{ 'contact administrator'|T }}</h5>
+        </div>
+        <br><br><br>
+        <div>
+            <button class="btn btn-primary" onclick="location.href='/auth/login';">{{ 'Login'|T }}</button>
+            <button class="btn btn-default" onclick="toHome();">{{ 'Return'|T }}</button>
+        </div>
+    </div>
+{% endblock %}

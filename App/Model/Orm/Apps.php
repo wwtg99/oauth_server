@@ -9,7 +9,10 @@
 namespace App\Model\Orm;
 
 
+use App\Model\Message;
+use Flight2wwu\Common\FWException;
 use Flight2wwu\Component\Database\OrmModel;
+use Purl\Url;
 
 class Apps extends OrmModel
 {
@@ -26,8 +29,8 @@ class Apps extends OrmModel
      */
     public function getAppId($app_name)
     {
-        $db = getDB();
-        $re = $db->getConnection()->get($this->getTableName(), 'app_id', ['app_name'=>$app_name]);
+        $db = getDB()->getConnection();
+        $re = $db->get($this->getTableName(), 'app_id', ['app_name'=>$app_name]);
         if ($re) {
             return $re;
         }
@@ -41,18 +44,23 @@ class Apps extends OrmModel
      * @param string $scope
      * @param string $state
      * @return string
+     * @throws FWException
      */
     public function generateCode($user_id, $client_id, $redirect_uri, $scope, $state = null)
     {
-        $app = $this->show($client_id);
-        if ($app) {
+        if ($client_id) {
             //registered app
-            $code = strtoupper(uniqid('R'));
+            $app = $this->show($client_id);
+            if ($app) {
+                $code = strtoupper(uniqid('R'));
+            } else {
+                throw new FWException(Message::messageList(100001));
+            }
         } else {
             //unregistered app
             $code = strtoupper(uniqid('U'));
         }
-        $url = new \Purl\Url($redirect_uri);
+        $url = new Url($redirect_uri);
         $url->query->set('code', $code);
         if ($state) {
             $url->query->set('state', $state);
@@ -76,10 +84,10 @@ class Apps extends OrmModel
             $expires = 86400;
         }
         $exp = date('Y-m-d', time() + $expires);
-        $db = getDB();
+        $db = getDB()->getConnection();
         $re = $db->queryOne("insert into access_tokens (user_id, app_id, expires_in, scope) values (:uid, :aid, :ex, :sp) returning id", ['uid'=>$user_id, 'aid'=>$client_id, 'ex'=>$exp, 'sp'=>$scope]);
         if ($re && $re['id']) {
-            $token = $db->getConnection()->get('access_tokens', 'access_token', ['id'=>$re['id']]);
+            $token = $db->get('access_tokens', 'access_token', ['id'=>$re['id']]);
             return ['access_token'=>$token, 'expires_in'=>$expires];
         }
         return [];

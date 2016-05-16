@@ -17,9 +17,30 @@ class FormatUtilsTest extends PHPUnit_Framework_TestCase {
     public function testFormat() {
         # path
         $paths = ['', DIRECTORY_SEPARATOR, 'aa', 'aa' . DIRECTORY_SEPARATOR, 'aa/bb', DIRECTORY_SEPARATOR . 'cc', '/cc/dd' . DIRECTORY_SEPARATOR];
-        $expes = ['', '', 'aa', 'aa', 'aa/bb', DIRECTORY_SEPARATOR . 'cc', '/cc/dd'];
+        $expes = ['', DIRECTORY_SEPARATOR, 'aa', 'aa', 'aa/bb', DIRECTORY_SEPARATOR . 'cc', '/cc/dd'];
         for ($i = 0; $i < count($paths); $i++) {
             $this->assertEquals($expes[$i], FormatUtils::formatPath($paths[$i]));
+        }
+        $paths = [
+            ['a', 'b', 'c'],
+            ['a', 'b', 'c.txt'],
+            [DIRECTORY_SEPARATOR, 'b', 'c.txt'],
+            ['/a', 'b', 'c.txt'],
+            ['', 'b', 'c.txt'],
+            ['a', '', 'c'],
+            ['a', 'b' . DIRECTORY_SEPARATOR, 'c'],
+        ];
+        $expes = [
+            'a' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c',
+            'a' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c.txt',
+            DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c.txt',
+            '/a' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c.txt',
+            'b' . DIRECTORY_SEPARATOR . 'c.txt',
+            'a' . DIRECTORY_SEPARATOR . 'c',
+            'a' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c'
+        ];
+        for ($i = 0; $i < count($paths); $i++) {
+            $this->assertEquals($expes[$i], FormatUtils::formatPathArray($paths[$i]));
         }
         # web path
         $paths = ['', 'aa', '/aa', 'aa/', '/aa/', 'aa/bb', '/aa/bb/'];

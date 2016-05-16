@@ -51,13 +51,18 @@ class HomeController extends BaseController
         $url = self::getRequest()->url;
         $method = self::getRequest()->method;
         $path = parse_url($url, PHP_URL_PATH);
+        // last path
+        $skip = ['/403', '/404', '/auth/login', '/oauth/login', '/oauth/redirect_login'];
+        if (!in_array($path, $skip) && !self::getRequest()->ajax) {
+            getOValue()->addOldOnce('last_path', $path);
+        }
         if (getAuth()->isLogin()) {
             $user = getUser()['user_id'];
         } else {
             $user = 'anonymous';
         }
         $logger = getLog();
-        //skip /403
+        // skip /403
         if ($path == '/403') {
             return true;
         }
@@ -83,7 +88,7 @@ class HomeController extends BaseController
         if (self::getRequest()->ajax) {
             \Flight::json([]);
         } else {
-            getView()->render('error/403');
+            getView()->render('error/403', ['title'=>'authentication failed']);
         }
         return false;
     }
@@ -106,9 +111,6 @@ class HomeController extends BaseController
             ['uri'=>'/user/info', 'descr'=>'获取用户信息', 'need_scope'=>'get_user_info', 'param'=>null],
             ['uri'=>'/tool/send_email', 'descr'=>'以no-reply@genowise.com发送邮件', 'need_scope'=>'send_email', 'param'=>'<ul><li>to: 收件人，多个以逗号分隔，必选</li><li>subject: 主题，必选</li><li>body: 正文，支持部分html代码，必选</li><li>cc: 抄送，可选</li><li>bcc: 密送，可选</li></ul>'],
             ['uri'=>'/tool/express_info', 'descr'=>'查询快递信息', 'need_scope'=>T('open for all'), 'param'=>'<ul><li>company: 快递公司代号，详见<a href="/express_company.txt" target="_blank">列表</a>，必选</li><li>no: 快递单号，必选</li><li>type: 返回类型，默认字符串，可选json</li></ul>'],
-            ['uri'=>'/genobase/marker_map', 'descr'=>'转换marker和GW号', 'need_scope'=>'临时公开', 'param'=>'<ul><li>data: JSON数组格式，如["GWV0000001","GWV0000002"]，必选</li><li>type: 转换类型，1为mutation转GW号（默认），2为GW号转mutation</li></ul>'],
-            ['uri'=>'/genobase/markers', 'descr'=>'获取marker信息', 'need_scope'=>'临时公开', 'param'=>'<ul><li>gwid: GW号，多个以逗号分隔</li><li>mutation: mutation名，多个以逗号分隔</li><li>gene: 基因名，多个以逗号分隔</li></ul>'],
-            ['uri'=>'/pharm/pharmgkb', 'descr'=>'获取PharmGKB数据(POST)', 'need_scope'=>'临时公开', 'param'=>'<ul><li>name: 药物名，多个以逗号分隔，必选</li></ul>'],
         ];
         getAssets()->addLibrary(['bootstrap-table']);
         getView()->render('apis', ['apis'=>$apis, 'api_head'=>FormatUtils::formatHead($api_head)]);

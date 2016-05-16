@@ -8,4 +8,8 @@
 
 require '../bootstrap/init.php';
 
-Flight::start();
+if (Flight::get('maintain')) {
+    Flight::halt(503, 'Maintenance');
+} else {
+    Flight::start();
+}

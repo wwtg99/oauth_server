@@ -1,0 +1,12 @@
+{% extends "layout.twig" %}
+{% block center %}
+    <div class="center_align">
+        <h1>{{ 'server error'|T }} ({{ code }})</h1>
+        <br>
+        <p>{{ message|T }}</p>
+        <br><br><br>
+        <div>
+            <button class="btn btn-default" onclick="toHome();">{{ 'Return'|T }}</button>
+        </div>
+    </div>
+{% endblock %}

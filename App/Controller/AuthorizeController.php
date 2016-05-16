@@ -13,6 +13,7 @@ use App\Model\Auth\User;
 use App\Model\Message;
 use App\Model\Orm\Apps;
 use Flight2wwu\Common\BaseController;
+use Flight2wwu\Common\FWException;
 
 class AuthorizeController extends BaseController
 {
@@ -222,6 +223,7 @@ class AuthorizeController extends BaseController
      * @param string $redirect_uri
      * @param string $state
      * @return array
+     * @throws FWException
      */
     private static function authorizeToken($client_id, $client_secret, $code, $redirect_uri, $state = null)
     {
@@ -237,8 +239,11 @@ class AuthorizeController extends BaseController
             $uid = $c['user_id'];
             if (substr($code, 0, 1) == 'R') {
                 //registered app
-                $app = $apps->show($client_id);
-                if ($app) {
+                if ($client_id) {
+                    $app = $apps->show($client_id);
+                    if (!$app) {
+                        throw new FWException(Message::messageList(100001));
+                    }
                     if (!Apps::checkRedirectUrl($app['redirect_uri'], $redirect_uri)) {
                         $redata = ['error' => Message::getMessage(100010)];
                         return $redata;

@@ -7,6 +7,7 @@
  */
 
 namespace Flight2wwu\Common;
+use App\Model\Message;
 
 /**
  * Class BaseController
@@ -139,9 +140,9 @@ abstract class BaseController
      * @param string $name
      * @param string $message
      * @param int $code
-     * @return array|string
+     * @return Message|string
      */
-    public static function checkInput($name, $message, $code)
+    public static function checkInput($name, $message = '', $code = 1)
     {
         $req = self::getRequest();
         if (isset($req->data[$name])) {
@@ -150,7 +151,10 @@ abstract class BaseController
         if (isset($req->query[$name])) {
             return $req->query[$name];
         }
-        return ['message'=>$message, 'code'=>$code];
+        if (!$message) {
+            $message = "$name does not exists";
+        }
+        return new Message($code, $message);
     }
 
     /**
@@ -158,7 +162,7 @@ abstract class BaseController
      *
      * @param array $namelist
      * @param array $message: ['name'=>['message'=>'', 'code'=>''], ...]
-     * @return array|bool
+     * @return Message|bool
      */
     public static function checkInputs(array $namelist, array $message)
     {
@@ -166,10 +170,10 @@ abstract class BaseController
             if (array_key_exists($item, $message)) {
                 $msg = $message[$item];
             } else {
-                $msg = ['message'=>"invalid $item", 'code'=>1];
+                $msg = ['message'=>"$item does not exists", 'code'=>1];
             }
             $re = self::checkInput($item, $msg['message'], $msg['code']);
-            if (is_array($re)) {
+            if ($re instanceof Message) {
                 return $re;
             }
         }

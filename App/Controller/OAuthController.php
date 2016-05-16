@@ -32,7 +32,7 @@ class OAuthController extends BaseController
         if ($uri) {
             \Flight::redirect($uri);
         } else {
-            throw new Exception('illegal oauth');
+            throw new Exception('illegal oauth', 1);
         }
         return false;
     }
@@ -45,11 +45,15 @@ class OAuthController extends BaseController
             $token = User::getAccessToken($code, $state);
             if (isset($token['access_token']) && isset($token['expires_in'])) {
                 if (getAuth()->attempt(['token'=>$token['access_token'], 'expires_in'=>$token['expires_in']], false)) {
+                    $path = getOValue()->getOldOnce('last_path');
+                    if ($path) {
+                        self::$redirectPath = $path;
+                    }
                     \Flight::redirect(self::$redirectPath);
                     return false;
                 }
             }
         }
-        throw new Exception('login error');
+        throw new Exception('no code', 5);
     }
 }

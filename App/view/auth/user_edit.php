@@ -40,36 +40,7 @@
     </div>
     <script>
         function init_center() {
-            $('input').iCheck({
-                checkboxClass: 'icheckbox_flat-green',
-                radioClass: 'iradio_flat-green'
-            });
-            $('.selectpicker').selectpicker();
-            window.roles = [];
-//            $('.ch_roles').click(changeRoles);
-            $('.ch_roles').on('ifChanged', changeRoles);
-            <?php if(isset($user_id)): ?>
-            loadForm(<?php echo json_encode($user); ?>);
-            <?php else: ?>
-            $('#lb_id').hide();
-            $('#txt_id').hide();
-            <?php endif; ?>
-        }
 
-        function loadForm(user) {
-            $('#txt_id').val(user['user_id']);
-            $('#txt_id').prop('readonly', 1);
-            $('#txt_name').val(user['name']);
-            $('#txt_label').val(user['label']);
-            $('#txt_email').val(user['email']);
-            $('#txt_descr').val(user['descr']);
-            $('#sel_dep').selectpicker('val', user['department_id']);
-            var roles = user['roles'];
-            roles = roles.split(',');
-            window.roles = roles;
-            for(var i in roles) {
-                $('#ch_' + roles[i]).iCheck('check');
-            }
         }
 
     </script>

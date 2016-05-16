@@ -50,14 +50,9 @@ class Admin
     public static function createDepartment($department_id, $name, $descr)
     {
         $db = getDB()->getConnection('main');
-        $dep = self::getDepartment($department_id);
-        if ($dep) {
-            return false;
-        }
-        $db->insert('departments', ['department_id'=>$department_id, 'name'=>$name, 'descr'=>$descr]);
-        $dep = self::getDepartment($department_id);
-        if ($dep) {
-            return $dep['department_id'];
+        $re = $db->insert('departments', ['department_id'=>$department_id, 'name'=>$name, 'descr'=>$descr]);
+        if ($re) {
+            return $department_id;
         }
         return false;
     }
@@ -126,14 +121,12 @@ class Admin
     public static function createRole($name, $descr)
     {
         $db = getDB()->getConnection('main');
-        $re = Admin::getRole(null, $name);
+        $re = $db->insert(Admin::SCHEMA . 'roles', ['name'=>$name, 'descr'=>$descr]);
         if ($re) {
-            return false;
-        }
-        $db->insert(Admin::SCHEMA . 'roles', ['name'=>$name, 'descr'=>$descr]);
-        $re = Admin::getRole(null, $name);
-        if ($re) {
-            return $re['role_id'];
+            $re = Admin::getRole(null, $name);
+            if ($re) {
+                return $re['role_id'];
+            }
         }
         return false;
     }
@@ -213,11 +206,13 @@ class Admin
     {
         $db = getDB()->getConnection('main');
         $name = $user['name'];
-        $db->insert(Admin::SCHEMA . 'users', $user);
-        $uid = $db->query("select " . Admin::SCHEMA . "get_user_id('$name')")->fetchColumn();
-        $re = Admin::changeRoles($uid, $roles);
+        $re = $db->insert(Admin::SCHEMA . 'users', $user);
         if ($re) {
-            return $uid;
+            $uid = $db->query("select " . Admin::SCHEMA . "get_user_id('$name')")->fetchColumn();
+            $re = Admin::changeRoles($uid, $roles);
+            if ($re) {
+                return $uid;
+            }
         }
         return false;
     }
@@ -242,16 +237,16 @@ class Admin
     public static function updateUser($user_id, array $user, $roles)
     {
         $db = getDB()->getConnection('main');
-        $db->exec('BEGIN;');
+        $db->begin();
         $re = $db->update(Admin::SCHEMA . 'users', $user, ['user_id'=>$user_id]);
         if ($re) {
             $re = Admin::changeRoles($user_id, $roles);
             if ($re) {
-                $db->exec('COMMIT;');
+                $db->commit();
                 return true;
             }
         }
-        $db->exec('ROLLBACK;');
+        $db->rollback();
         return false;
     }
 
@@ -262,7 +257,7 @@ class Admin
      */
     public static function changeRoles($user_id, $roles)
     {
-        $db = getDB()->reconnect('main');
+        $db = getDB()->getConnection('main');
         if (!is_array($roles)) {
             $roles = explode(',', $roles);
         }
@@ -311,5 +306,35 @@ class Admin
             return true;
         }
         return false;
+    }
+
+    /**
+     * @return int
+     * @throws \Exception
+     */
+    public static function departmentNum()
+    {
+        $db = getDB()->getConnection('main');
+        return $db->count('departments');
+    }
+
+    /**
+     * @return int
+     * @throws \Exception
+     */
+    public static function userNum()
+    {
+        $db = getDB()->getConnection('main');
+        return $db->count('users');
+    }
+
+    /**
+     * @return int
+     * @throws \Exception
+     */
+    public static function roleNum()
+    {
+        $db = getDB()->getConnection('main');
+        return $db->count('roles');
     }
 } 

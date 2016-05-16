@@ -1,0 +1,48 @@
+{% extends"admin/home.twig" %}
+{% block title %}{{ 'Role Management'|T }}{% endblock %}
+{% block sidenav_0 %}{% endblock %}
+{% block sidenav_3 %}active{% endblock %}
+{% block center %}
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            {% set m = old('admin_msg') %}
+            {% if m %}
+                {{ component('alert', {'level': m.type, 'data': {'message': m.message|T}}) }}
+            {% endif %}
+            <form class="form" role="form" id="form_role" method="post" action="/admin/add_role">
+                <div class="form-group">
+                    <label class="control-label" for="txt_id" id="lb_id">{{ 'role_id'|T }}></label>
+                    <input class="form-control" name="role_id" type="text" id="txt_id">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txt_name">{{ 'name'|T }}</label>
+                    <input class="form-control" name="name" type="text" id="txt_name" required>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txt_descr">{{ 'descr'|T }}</label>
+                    <input class="form-control" name="descr" type="text" id="txt_descr">
+                </div>
+                <button class="btn btn-primary" type="submit">{{ 'Submit'|T }}</button>
+                <button class="btn btn-default" type="reset">{{ 'Reset'|T }}</button>
+                <a href="/admin/roles" class="btn btn-default" type="button">{{ 'Return'|T }}</a>
+            </form>
+        </div>
+    </div>
+    <script>
+        function init_center() {
+            {% if role_id is defined %}
+            loadForm({{ role|J }});
+            {% else %}
+            $('#lb_id').hide();
+            $('#txt_id').hide();
+            {% endif %}
+        }
+
+        function loadForm(role) {
+            $('#txt_id').val(role['role_id']);
+            $('#txt_id').prop('readonly', 1);
+            $('#txt_name').val(role['name']);
+            $('#txt_descr').val(role['descr']);
+        }
+    </script>
+{% endblock %}

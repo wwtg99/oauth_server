@@ -1,0 +1,93 @@
+{% extends"admin/home.twig" %}
+{% block title %}{{ 'User Management'|T }}{% endblock %}
+{% block sidenav_0 %}{% endblock %}
+{% block sidenav_2 %}active{% endblock %}
+{% block center %}
+    <div class="row">
+        <div class="btn-group" role="group">
+            <a class="btn btn-default" href="/admin/add_user" role="button"><span class="glyphicon glyphicon-plus"></span> {{ 'New User'|T }}</a>
+            <a class="btn btn-default" href="/admin/home" role="button"><span class="glyphicon glyphicon-home"></span> {{ 'Return'|T }}</a>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <table class="table" id="tb_user"></table>
+    </div>
+    <script>
+        function init_center() {
+            var head = {{ users_head|J }};
+            for (var i in head) {
+                if (head[i]['field'] == 'superuser') {
+                    head[i]['formatter'] = booleanFormatter;
+                } else if (head[i]['field'] == 'user_id') {
+                    head[i]['formatter'] = function (val, row, index) {
+                        return '<a href="/admin/users?user_id=' + val + '">' + val + '</a>';
+                    };
+                }
+            }
+            head.push({
+                field: 'operation',
+                title: '{{ 'operation'|T }}',
+                formatter: function (val, row, index) {
+                    var opts = ['<button class="btn btn-link del">{{ 'Delete'|T }}</button>'];
+                    if (!row['deleted_at']) {
+                        opts.push('<button class="btn btn-link inac">{{ 'Inactive'|T }}</button>');
+                    } else {
+                        opts.push('<button class="btn btn-link ac">{{ 'Active'|T }}</button>');
+                    }
+                    return opts.join(' ');
+                },
+                'events': {
+                    'click .del': function (ent, val, row, index) {
+                        BootstrapDialog.confirm('{{ 'confirm delete'|T }}', function (re) {
+                            if (re) {
+                                var url = '/admin/delete_user';
+                                var pdata = {"user_id": row['user_id'], "hard": 1};
+                                $.post(url, pdata, function (data) {
+                                    //console.log(data);
+                                    if (data['result']) {
+                                        location.reload();
+                                    } else {
+                                        BootstrapDialog.alert('{{ 'delete failed'|T }}');
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    'click .inac': function (evt, val, row, index) {
+                        var url = '/admin/delete_user';
+                        var pdata = {"user_id": row['user_id'], "active": 0};
+                        $.post(url, pdata, function (data) {
+//                            console.log(data);
+                            if (data['result']) {
+                                location.reload();
+                            } else {
+                                BootstrapDialog.alert('{{ 'inactive failed'|T }}');
+                            }
+                        });
+                    },
+                    'click .ac': function (evt, val, row, index) {
+                        var url = '/admin/delete_user';
+                        var pdata = {"user_id": row['user_id'], "active": 1};
+                        $.post(url, pdata, function (data) {
+//                            console.log(data);
+                            if (data['result']) {
+                                location.reload();
+                            } else {
+                                BootstrapDialog.alert('{{ 'active failed'|T }}');
+                            }
+                        });
+                    }
+                }
+            });
+            $('#tb_user').bootstrapTable({
+                columns: head,
+                data: {{ users|J }},
+                sortable: true,
+                striped: true,
+                search: true,
+                pagination: true
+            });
+        }
+    </script>
+{% endblock %}

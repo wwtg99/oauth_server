@@ -11,6 +11,8 @@ namespace App\Controller;
 
 use App\Model\Tool;
 use Flight2wwu\Component\Utils\FormatUtils;
+use StructureFile\FileType\ExcelFile;
+use StructureFile\FileType\TxtFile;
 
 class ToolController extends TokenController
 {
@@ -60,6 +62,27 @@ class ToolController extends TokenController
         } else {
             \Flight::json(['error'=>$re]);
         }
+        return false;
+    }
+
+    public static function convert_file()
+    {
+        $data = self::getInput('data');
+        if (!$data) {
+            \Flight::json([]);
+            return false;
+        }
+        $data = json_decode($data, true);
+        $head = self::getInput('head', '[]');
+        $head = json_decode($head, true);
+        $type = self::getInput('type', 'txt');
+        $name = self::getInput('filename');
+        if ($type == 'xlsx') {
+            $f = ExcelFile::createFromData($data, $head, '');
+        } else {
+            $f = TxtFile::createFromData($data, $head);
+        }
+        $f->download($name);
         return false;
     }
 }

@@ -20,7 +20,10 @@ class AdminController extends BaseController
 
     public static function home()
     {
-        getView()->render('admin/home');
+        $dnum = Admin::departmentNum();
+        $unum = Admin::userNum();
+        $rnum = Admin::roleNum();
+        getView()->render('admin/home', ['department_num'=>$dnum, 'user_num'=>$unum, 'role_num'=>$rnum]);
     }
 
     public static function plugins()
@@ -48,7 +51,7 @@ class AdminController extends BaseController
             PluginManager::getInstance()->writeConfig();
             \Flight::json(['enabled'=>$pid]);
         }
-        \Flight::redirect('/404');
+        \Flight::redirect('/404', 404);
     }
 
     public static function disable_plugin()
@@ -59,7 +62,7 @@ class AdminController extends BaseController
             PluginManager::getInstance()->writeConfig();
             \Flight::json(['disabled'=>$pid]);
         }
-        \Flight::redirect('/404');
+        \Flight::redirect('/404', 404);
     }
 
     public static function users()
@@ -69,7 +72,7 @@ class AdminController extends BaseController
             $user = Admin::getUser($uid);
             $dep = Admin::getDepartment();
             $roles = Admin::getRole();
-            getAssets()->addLibrary(['bootstrap-table', 'bootstrap-select', 'icheck', 'lodash']);
+            getAssets()->addLibrary(['bootstrap-table', 'bootstrap-select', 'icheck', 'lodash', 'bootstrap-dialog']);
             getView()->render('admin/user_info', ['user_id' => $uid, 'user' => $user, 'departments' => $dep, 'roles' => $roles]);
         } else {
             $users = Admin::getUser();
@@ -139,7 +142,19 @@ class AdminController extends BaseController
             \Flight::json(['result'=>$re]);
             return false;
         }
-        \Flight::redirect('/404');
+        \Flight::redirect('/404', 404);
+        return false;
+    }
+
+    public static function reset_pwd()
+    {
+        if (self::checkMethod('POST')) {
+            $uid = self::getInput('user_id');
+            $re = Admin::resetPassword($uid);
+            \Flight::json(['result'=>$re]);
+            return false;
+        }
+        \Flight::redirect('/404', 404);
         return false;
     }
 
@@ -205,7 +220,7 @@ class AdminController extends BaseController
             \Flight::json(['result'=>$re]);
             return false;
         }
-        \Flight::redirect('/404');
+        \Flight::redirect('/404', 404);
         return false;
     }
 
@@ -271,7 +286,7 @@ class AdminController extends BaseController
             \Flight::json(['result'=>$re]);
             return false;
         }
-        \Flight::redirect('/404');
+        \Flight::redirect('/404', 404);
         return false;
     }
 
@@ -350,5 +365,4 @@ class AdminController extends BaseController
         \Flight::redirect('/404');
         return false;
     }
-
 } 

@@ -116,4 +116,13 @@ return [
     'redirect_uri'=>'重定向网址',
     'app_secret'=>'应用密钥',
     'New App'=>'添加新应用',
+    'Reset Password'=>'重置密码',
+    'confirm to reset password'=>'确认重置密码？',
+    'illegal id or name'=>'非法的ID或名称！',
+    'fail to create'=>'创建失败！',
+    'fail to update'=>'更新失败！',
+    'fail to delete'=>'删除失败！',
+    'update successfully'=>'修改成功！',
+    'invalid roles'=>'无效的角色！',
+    'create successfully'=>'创建成功！',
 ];

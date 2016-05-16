@@ -40,7 +40,7 @@ class RoleAuth implements ServiceProvider, IAuth
 
     /**
      * @param array $user
-     * @param bool $cookie
+     * @param bool $cookie: load from cookie first
      * @return bool
      */
     public function attempt(array $user, $cookie = true)
@@ -56,7 +56,7 @@ class RoleAuth implements ServiceProvider, IAuth
         }
         $u = User::verify($user);
         if ($u !== false) {
-            $expires = array_key_exists('expires_in', $u) ? $u['expires_in'] : null;
+            $expires = array_key_exists('expires_in', $u) ? ($u['expires_in'] - time()) : null;
             $this->login($u, $expires, !$cookie);
             return true;
         }
@@ -132,6 +132,20 @@ class RoleAuth implements ServiceProvider, IAuth
     }
 
     /**
+     * @param array $user
+     * @return array
+     */
+    public function refreshUser($user)
+    {
+        $u = User::refreshUser($this->user);
+        if ($u) {
+            $expires_in = isset($this->user['expires_in']) ? ($this->user['expires_in'] - time()) : null;
+            $this->login($u, $expires_in, false);
+        }
+        return $this->user;
+    }
+
+    /**
      * @return mixed
      */
     public function register()
@@ -145,20 +159,19 @@ class RoleAuth implements ServiceProvider, IAuth
     public function boot()
     {
         $auth = \Flight::get('auth');
-        $this->use_session = isset($auth['session']) ? $auth['session'] : false;
-        $this->use_cookie = isset($auth['cookie']) ? $auth['cookie'] : false;
-        if ($auth && array_key_exists('rbac', $auth)) {
-            $c = $auth['rbac'];
-            $this->loadRBAC($c);
-        }
+        $this->loadConfig($auth);
     }
 
     /**
      * @param array $arr
      */
-    public function loadRBAC(array $arr)
+    public function loadConfig(array $arr)
     {
-        $this->rbac = $arr;
+        $this->use_session = isset($arr['session']) ? $arr['session'] : false;
+        $this->use_cookie = isset($arr['cookie']) ? $arr['cookie'] : false;
+        if ($arr && array_key_exists('rbac', $arr)) {
+            $this->rbac = $arr['rbac'];
+        }
     }
 
     /**
@@ -215,29 +228,11 @@ class RoleAuth implements ServiceProvider, IAuth
     }
 
     /**
-     * @return array|string
-     */
-    private function getRoles()
-    {
-        if ($this->isLogin()) {
-            $roles = $this->user['roles'];
-            if (is_array($roles)) {
-                array_push($roles, 'common_user');
-                return $roles;
-            } else {
-                $roles .= ',common_user';
-                return explode(',', $roles);
-            }
-        }
-        return 'anonymous';
-    }
-
-    /**
      * @param string|array $role
      * @param string $object
      * @return int
      */
-    private function getRoleAuth($role, $object)
+    public function getRoleAuth($role, $object)
     {
         $object = trim($object);
         if (is_array($role)) {
@@ -268,7 +263,7 @@ class RoleAuth implements ServiceProvider, IAuth
      * @param string $path
      * @return int
      */
-    private function getPathAuth($role, $path)
+    public function getPathAuth($role, $path)
     {
         $path = trim($path);
         $a = $this->getRoleAuth($role, $path);
@@ -293,5 +288,23 @@ class RoleAuth implements ServiceProvider, IAuth
             $a = 0;
         }
         return $a;
+    }
+
+    /**
+     * @return array|string
+     */
+    private function getRoles()
+    {
+        if ($this->isLogin()) {
+            $roles = $this->user['roles'];
+            if (is_array($roles)) {
+                array_push($roles, 'common_user');
+                return $roles;
+            } else {
+                $roles .= ',common_user';
+                return explode(',', $roles);
+            }
+        }
+        return 'anonymous';
     }
 } 

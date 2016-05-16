@@ -1,0 +1,23 @@
+.seq_div {
+    font-family: "Droid Sans Mono";
+    font-size: 16px;
+}
+
+.seq_div pre {
+    letter-spacing: 1px;
+    font-size: 14px;
+    margin: 0;
+    padding: 0 10px 0 10px;
+    word-wrap: normal;
+    border: hidden;
+}
+
+.seq_div .reads {
+    color: #999999;
+}
+
+.seq_div .mismatch {
+    color: #000000;
+    font-weight: 900;
+    font-size: 15px;
+}

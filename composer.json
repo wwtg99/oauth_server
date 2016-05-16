@@ -24,7 +24,6 @@
         "monolog/monolog": "~1.17",
         "desarrolla2/cache":  "~2.0",
         "respect/validation": "~1.0",
-        "phpoffice/phpexcel": "~1.8",
         "maximebf/debugbar": "~1.11",
         "erusev/parsedown": "~1.6",
         "tecnickcom/tcpdf": "~6.2",
@@ -34,6 +33,7 @@
         "swiftmailer/swiftmailer": "~5.4",
         "catfan/Medoo": "~1.0",
         "jwage/purl": "*",
+        "twig/twig": "~1.0",
         "wwtg99/structure-files": "~0.1",
         "wwtg99/html_component": "~0.1"
     },
@@ -42,5 +42,11 @@
     },
     "autoload": {
         "psr-4": {"Flight2wwu\\": "src/Flight2wwu"}
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
     }
 }

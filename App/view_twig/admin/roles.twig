@@ -1,0 +1,65 @@
+{% extends"admin/home.twig" %}
+{% block title %}{{ 'Role Management'|T }}{% endblock %}
+{% block sidenav_0 %}{% endblock %}
+{% block sidenav_3 %}active{% endblock %}
+{% block center %}
+    <div class="row">
+        <div class="btn-group" role="group">
+            <a class="btn btn-default" href="/admin/add_role" role="button"><span class="glyphicon glyphicon-plus"></span> {{ 'New Role'|T }}</a>
+            <a class="btn btn-default" href="/admin/home" role="button"><span class="glyphicon glyphicon-home"></span> {{ 'Return'|T }}</a>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <table class="table" id="tb_role"></table>
+    </div>
+    <script>
+        function init_center() {
+            var head = {{ roles_head|J }};
+            for (var i in head) {
+                if (head[i]['field'] == 'role_id') {
+                    head[i]['formatter'] = function (val, row, index) {
+                        return '<a href="/admin/roles?role_id=' + val + '">' + val + '</a>';
+                    };
+                }
+            }
+            head.push({
+                field: 'operation',
+                title: '{{ 'operation'|T }}',
+                formatter: function (val, row, index) {
+                    var opts = [];
+                    if (row['role_id'] != 1 && row['role_id'] != 2) {
+                        opts.push('<button class="btn btn-link del">{{ 'Delete'|T }}</button>');
+                    }
+                    return opts.join(' ');
+                },
+                'events': {
+                    'click .del': function (ent, val, row, index) {
+                        BootstrapDialog.confirm('{{ 'confirm delete'|T }}', function (re) {
+                            if (re) {
+                                var url = '/admin/delete_role';
+                                var pdata = {"role_id": row['role_id']};
+                                $.post(url, pdata, function (data) {
+//                                    console.log(data);
+                                    if (data['result']) {
+                                        location.reload();
+                                    } else {
+                                        BootstrapDialog.alert('{{ 'delete failed'|T }}');
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+            $('#tb_role').bootstrapTable({
+                columns: head,
+                data: {{ roles|J }},
+                sortable: true,
+                striped: true,
+                search: true,
+                pagination: true
+            });
+        }
+    </script>
+{% endblock %}

@@ -3,13 +3,13 @@
         <h1><?php TP('Document'); ?></h1>
     </div>
     <div class="row">
-        <p class="h3">OAuth介绍</p>
-        <p>请参见 <a href="https://en.wikipedia.org/wiki/OAuth" target="_blank">https://en.wikipedia.org/wiki/OAuth</a> 以及 <a href="http://wiki.open.qq.com/wiki/website/OAuth2.0%E7%AE%80%E4%BB%8B" target="_blank">http://wiki.open.qq.com/wiki/website/OAuth2.0%E7%AE%80%E4%BB%8B</a></p>
+        <p class="h3">OAuth介绍</p><br>
+        <p class="col-md-offset-2">请参见 <a href="https://en.wikipedia.org/wiki/OAuth" target="_blank">https://en.wikipedia.org/wiki/OAuth</a> 以及 <a href="http://wiki.open.qq.com/wiki/website/OAuth2.0%E7%AE%80%E4%BB%8B" target="_blank">http://wiki.open.qq.com/wiki/website/OAuth2.0%E7%AE%80%E4%BB%8B</a></p>
     </div>
     <div class="row">
-        <p class="h3">SDK下载</p>
+        <p class="h3">SDK下载</p><br>
         <div class="col-md-2">
-            <ul class="nav nav-pills nav-stacked">
+            <ul class="nav nav-pills nav-stacked" id="sdk_list">
                 <li role="presentation"><a href="javascript:change_panel(1);">Python</a></li>
                 <li role="presentation"><a href="javascript:change_panel(2);">PHP</a></li>
             </ul>
@@ -39,6 +39,8 @@
         function change_panel(id) {
             $('.div_panel').hide();
             $('#div_' + id).show();
+            $('#sdk_list > li').removeClass('active');
+            $('#sdk_list > li:nth-child(' + id + ')').addClass('active');
         }
     </script>
 </div>

@@ -21,6 +21,8 @@ trait TOpenAuth
      */
     private static $userInfoPath = 'http://192.168.0.21:10000/user/info';
 
+    private static $syncUser = true;
+
     /**
      * @param array $user
      * @return array|bool
@@ -31,9 +33,12 @@ trait TOpenAuth
             $token = $user['token'];
             $u = self::getUser($token);
             if ($u && !array_key_exists('error', $u)) {
+                if (self::$syncUser) {
+                    User::syncUser($u);
+                }
                 $u[User::KEY_USER_TOKEN] = $token;
                 if (array_key_exists('expires_in', $user)) {
-                    $u['expires_in'] = $user['expires_in'];
+                    $u['expires_in'] = $user['expires_in'] + time();
                 }
                 return $u;
             }
@@ -128,6 +133,40 @@ trait TOpenAuth
             }
         }
         return null;
+    }
+
+    /**
+     * @param array $user
+     * @return array
+     * @throws \Exception
+     */
+    public static function refreshUser($user)
+    {
+        if (isset($user[User::KEY_USER_TOKEN])) {
+            $user = self::getUser($user[User::KEY_USER_TOKEN]);
+            if ($user) {
+                return $user;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * @param $user
+     * @return bool
+     * @throws \Exception
+     */
+    public static function syncUser($user)
+    {
+        if ($user && isset($user['user_id']) && isset($user['name'])) {
+            $db = getDB()->getConnection();
+            $u = $db->get('users', '*', [User::KEY_USER_ID=>$user['user_id']]);
+            if (!$u) {
+                $db->insert('users', [User::KEY_USER_ID=>$user['user_id'], User::KEY_USER_NAME=>$user['name'], User::KEY_USER_EMAIL=>$user['email'], 'department_id'=>$user['department_id'], 'label'=>$user['label']]);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

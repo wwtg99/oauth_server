@@ -21,14 +21,13 @@ class StorageTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($cache->has('t1'));
         $cache->delete('t1');
         $this->assertFalse($cache->has('t1'));
-        $this->assertEquals('v2', $cache->get('t2')->get());
-        $cache->set('t3', ['a'=>1, 'b'=>2, 'c'=>3]);
-        $this->assertEquals(2, $cache->get('t3')->get('b'));
-        $this->assertTrue($cache->get('t3')->has('c'));
-        $a = $cache->get('t3');
-        $a->delete('a');
-        $cache->set('t3', $a);
-        $this->assertEquals(['b'=>2, 'c'=>3], $cache->get('t3')->get(null));
+        $this->assertEquals('v2', $cache->get('t2'));
+        $t3 = ['a'=>1, 'b'=>2, 'c'=>3];
+        $cache->set('t3', $t3);
+        $this->assertEquals($t3, $cache->get('t3'));
+        $t4 = ['b'=>2, 'c'=>3];
+        $cache->set('t3', $t4);
+        $this->assertEquals($t4, $cache->get('t3'));
     }
 
     public function testOldValue()

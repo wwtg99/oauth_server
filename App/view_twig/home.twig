@@ -1,0 +1,19 @@
+{% extends "layout.twig" %}
+{% block title %}{{ getConfig('app') }}{% endblock %}
+{% block center %}
+    <div class="center_align">
+        <h1>{{ getConfig('app') }} {% if isDebug() %} &lt;{{ 'Debug Mode'|T }}&gt;{% endif %}</h1>
+        <div>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-globe"></span> {{ 'Language'|T }}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="?language=zh_CN">简体中文</a></li>
+                    <li><a href="?language=en_AM">English</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

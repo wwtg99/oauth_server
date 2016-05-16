@@ -23,7 +23,7 @@ function getPlugin($name)
 }
 
 /**
- * @return \Flight2wwu\Component\Database\PdoDB|\Flight2wwu\Component\Database\MedooDB
+ * @return \Flight2wwu\Component\Database\MedooPool
  */
 function getDB()
 {

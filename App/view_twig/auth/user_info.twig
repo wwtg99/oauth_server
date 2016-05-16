@@ -1,0 +1,28 @@
+{% extends "layout.twig" %}
+{% block center %}
+    <div class="container">
+        <div class="page-header text-center">
+            <h1>{{ 'User Center'|T }}</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-md-offset-1">
+                <p><label>{{ user.name }}</label> ({{ user.label }})</p>
+                <hr>
+                <p>{{ user.email }}</p>
+                <p>{{ 'user_id'|T ~ ': ' ~ user.user_id }} </p>
+                <p>{{ 'from department'|T ~ ': ' ~ user.department }}</p>
+                <p>{{ 'joined on'|T ~ ': ' ~ user.created_at }}</p>
+                <hr>
+                <p>{{ user.descr }}</p>
+                <p><a href="/auth/user_edit" class="btn btn-default"><span class="glyphicon glyphicon-pencil"> {{ 'Edit'|T }}</span></a></p>
+            </div>
+            <div class="col-md-6"></div>
+        </div>
+        <script>
+            function init_center() {
+
+            }
+
+        </script>
+    </div>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends"admin/home.twig" %}
+{% block title %}{{ 'User Management'|T }}{% endblock %}
+{% block sidenav_0 %}{% endblock %}
+{% block sidenav_2 %}active{% endblock %}
+{% block center %}
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            {% set m = old('admin_msg') %}
+            {% if m %}
+                {{ component('alert', {'level': m.type, 'data': {'message': m.message|T}}) }}
+            {% endif %}
+            <form class="form" role="form" id="form_user" method="post" action="/admin/add_user">
+                <div class="form-group">
+                    <label class="control-label" for="txt_id" id="lb_id">{{ 'user_id'|T }}</label>
+                    <input class="form-control" name="user_id" type="text" id="txt_id">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txt_name">{{ 'username'|T }}</label>
+                    <input class="form-control" name="name" type="text" id="txt_name" required>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txt_label">{{ 'label'|T }}</label>
+                    <input class="form-control" name="label" type="text" id="txt_label">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txt_email">{{ 'email'|T }}</label>
+                    <input class="form-control" name="email" type="text" id="txt_email">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="sel_dep">{{ 'department'|T }}</label>
+                    <select name="department_id" class="selectpicker form-control" id="sel_dep">
+                        {% for d in departments %}
+                        <option value="{{ d.department_id }}">{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txt_descr">{{ 'descr'|T }}</label>
+                    <input class="form-control" name="descr" type="text" id="txt_descr">
+                </div>
+                <div class="form-group">
+                    <label class="control-label">{{ 'roles'|T }}</label>
+                    <input name="roles" type="hidden" id="txt_roles">
+                </div>
+                <div class="form-group">
+                    {% for r in roles %}
+                    <label><input class="ch_roles" type="checkbox" id="ch_{{ r.name }}"> {{ r.name }} </label>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-primary" type="submit">{{ 'Submit'|T }}</button>
+                <button class="btn btn-default" type="reset">{{ 'Reset'|T }}</button>
+                <button class="btn btn-default" type="button" id="bt_reset_pwd">{{ 'Reset Password'|T }}</button>
+                <a href="/admin/users" class="btn btn-default" type="button">{{ 'Return'|T }}</a>
+            </form>
+        </div>
+    </div>
+    <script>
+        function init_center() {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_flat-green',
+                radioClass: 'iradio_flat-green'
+            });
+            $('.selectpicker').selectpicker();
+            window.roles = [];
+//            $('.ch_roles').click(changeRoles);
+            $('.ch_roles').on('ifChanged', changeRoles);
+            {% if user_id is defined %}
+            loadForm({{ user|J }});
+            $('#bt_reset_pwd').click(reset_pwd);
+            {% else %}
+            $('#lb_id').hide();
+            $('#txt_id').hide();
+            {% endif %}
+        }
+
+        function loadForm(user) {
+            $('#txt_id').val(user['user_id']);
+            $('#txt_id').prop('readonly', 1);
+            $('#txt_name').val(user['name']);
+            $('#txt_label').val(user['label']);
+            $('#txt_email').val(user['email']);
+            $('#txt_descr').val(user['descr']);
+            $('#sel_dep').selectpicker('val', user['department_id']);
+            var roles = user['roles'];
+            roles = roles.split(',');
+            window.roles = roles;
+            for(var i in roles) {
+                $('#ch_' + roles[i]).iCheck('check');
+            }
+        }
+
+        function changeRoles()
+        {
+            var role = $(this).prop('id');
+            role = role.substr(3);
+//            console.log(role);
+            if ($(this).prop('checked')) {
+                if (_.indexOf(window.roles, role) == -1) {
+                    window.roles.push(role);
+                }
+            } else {
+                if (_.indexOf(window.roles, role) >= 0) {
+                    window.roles = _.pull(window.roles, role);
+                }
+            }
+            window.roles = _.uniq(window.roles);
+            $('#txt_roles').val(window.roles.join(','));
+        }
+
+        function reset_pwd() {
+            var user_id = '{{ user_id }}';
+            BootstrapDialog.confirm('{{ 'confirm to reset password'|T }}', function(result) {
+                if (result) {
+                    var url = '/admin/reset_pwd';
+                    var pdata = {user_id: user_id};
+                    $.post(url, pdata, function (data) {
+                        if (data['result']) {
+                            BootstrapDialog.alert('{{ 'reset successfully'|T }}');
+                        } else {
+                            BootstrapDialog.alert('{{ 'reset failed'|T }}');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+{% endblock %}

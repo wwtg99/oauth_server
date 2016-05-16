@@ -29,8 +29,8 @@
                 </div>
                 <?php if(isset($msg)): ?>
                     <?php
-                    $ac = new \Components\Comp\AlertView($status);
-                    echo $ac->view(['message'=>TI($msg)]);
+                    $ac = new \Components\Comp\AlertView($msg['type']);
+                    echo $ac->view(['message'=>TI($msg['message'])]);
                     ?>
                 <?php endif; ?>
                 <div class="text-center" id="sec"></div>
@@ -40,7 +40,7 @@
 </div>
 <script>
     function init_center() {
-        <?php if (isset($status) && $status == 'success'): ?>
+        <?php if (isset($msg) && $msg['type'] == 'success'): ?>
         $('#sec').redirectAfter('/', 3);
         <?php endif; ?>
     }

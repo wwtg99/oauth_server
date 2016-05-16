@@ -21,8 +21,10 @@ CREATE TABLE public.roles (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
+CREATE SEQUENCE public.user_id_seq;
+
 CREATE TABLE public.users (
-  user_id TEXT PRIMARY KEY,
+  user_id TEXT PRIMARY KEY DEFAULT 'U' || lpad(nextval('user_id_seq')::TEXT, 6, '0'),
   name TEXT NOT NULL UNIQUE,
   password TEXT,
   label TEXT,
@@ -35,8 +37,6 @@ CREATE TABLE public.users (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   deleted_at TIMESTAMP WITH TIME ZONE
 );
-
-CREATE SEQUENCE public.user_id_seq;
 
 CREATE TABLE public.user_role (
   user_id TEXT NOT NULL REFERENCES public.users (user_id),
@@ -193,11 +193,12 @@ DECLARE
 BEGIN
   CASE TG_OP
     WHEN 'INSERT' THEN
-      NEW.created_at = now();
-      NEW.updated_at = now();
+      NEW.created_at := now();
+      NEW.updated_at := now();
       RETURN NEW;
     WHEN 'UPDATE' THEN
-      NEW.updated_at = now();
+      NEW.created_at := OLD.created_at;
+      NEW.updated_at := now();
       RETURN NEW;
     ELSE
       RETURN NULL;
@@ -214,11 +215,12 @@ DECLARE
 BEGIN
   CASE TG_OP
     WHEN 'INSERT' THEN
-      NEW.created_at = now();
-      NEW.updated_at = now();
+      NEW.created_at := now();
+      NEW.updated_at := now();
       RETURN NEW;
     WHEN 'UPDATE' THEN
-      NEW.updated_at = now();
+      NEW.created_at := OLD.created_at;
+      NEW.updated_at := now();
       RETURN NEW;
     ELSE
       RETURN NULL;
@@ -237,15 +239,18 @@ DECLARE
 BEGIN
   CASE TG_OP
     WHEN 'INSERT' THEN
-      _s := nextval('user_id_seq');
-      _id := 'U' || lpad(_s::TEXT, 6, '0');
-      NEW.user_id = _id;
-      NEW.created_at = now();
-      NEW.updated_at = now();
+      IF NEW.user_id IS NULL THEN
+        _s := nextval('user_id_seq');
+        _id := 'U' || lpad(_s::TEXT, 6, '0');
+        NEW.user_id = _id;
+      END IF;
+      NEW.created_at := now();
+      NEW.updated_at := now();
       RETURN NEW;
     WHEN 'UPDATE' THEN
-      NEW.user_id = OLD.user_id;
-      NEW.updated_at = now();
+      NEW.user_id := OLD.user_id;
+      NEW.created_at := OLD.created_at;
+      NEW.updated_at := now();
       INSERT INTO public.user_log (user_id, log_event, descr) VALUES (NEW.user_id, 'update', row_to_json(NEW)::TEXT);
       RETURN NEW;
     WHEN 'DELETE' THEN

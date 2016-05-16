@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="col-md-8 col-md-offset-1">
-            <p>des</p>
+            <p>Admin Panel</p>
         </div>
     </div>
     <script>

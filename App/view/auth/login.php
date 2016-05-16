@@ -25,8 +25,8 @@
                 </div>
                 <?php if(isset($msg)): ?>
                     <?php
-                    $ac = new \Components\Comp\AlertView($status);
-                    echo $ac->view(['message'=>TI($msg)]);
+                    $ac = new \Components\Comp\AlertView($msg['type']);
+                    echo $ac->view(['message'=>TI($msg['message'])]);
                     ?>
                 <?php endif; ?>
             </form>

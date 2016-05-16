@@ -1,0 +1,40 @@
+{% extends "layout.twig" %}
+{% block center %}
+    <div class="container">
+        <div class="page-header text-center">
+            <h1>{{ 'login to have our service'|TI }}</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <form class="form-horizontal" role="form" id="form_login" action="/auth/login" method="post">
+                    <div class="form-group">
+                        <label class="control-label col-md-2"><span class="glyphicon glyphicon-user"></span></label>
+                        <div class="col-md-10">
+                            <input class="form-control" type="text" name="username" placeholder="{{ 'Username'|T }}" value="{{ old('username') }}" tabindex="1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2"><span class="glyphicon glyphicon-lock"></span></label>
+                        <div class="col-md-10">
+                            <input class="form-control" type="password" name="password" placeholder="{{ 'Password'|T }}" tabindex="2">
+                        </div>
+                    </div>
+                    <div class="checkbox text-center">
+                        <label><input type="checkbox" name="remember">{{ 'Remember me'|T }}</label>
+                    </div>
+                    <div class="form-group text-center">
+                        <button class="btn btn-primary" type="submit" id="submit" tabindex="3">{{ 'Login'|T }}</button>
+                    </div>
+                    {% if msg is defined %}
+                        {{ component('alert', {'level': msg.type, 'data': {"message": msg.message|T}}) }}
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        function init_center() {
+
+        }
+    </script>
+{% endblock %}

@@ -13,6 +13,11 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
+/**
+ * Class CommandPlugin
+ * Abstract class to run other commands.
+ * @package Flight2wwu\Plugin
+ */
 abstract class CommandPlugin implements IPlugin
 {
 
@@ -26,6 +31,10 @@ abstract class CommandPlugin implements IPlugin
      */
     protected $cmd = '';
 
+    /**
+     * @var int
+     */
+    protected $timeout = 60;
     /**
      * @var string
      */
@@ -45,6 +54,7 @@ abstract class CommandPlugin implements IPlugin
         }
         $build = new ProcessBuilder();
         $pro = $build->setPrefix($this->cmd)->setArguments($args)->getProcess();
+        $pro->setTimeout($this->timeout);
         $rm = new \ReflectionMethod($this, 'output');
         $func = $rm->getClosure($this);
         $re = 0;

@@ -19,7 +19,7 @@ class AccessToken
      */
     public static function verify($token, $app_id)
     {
-        $db = getDB();
+        $db = getDB()->getConnection();
         $re = $db->queryOne("select verify_token(:tk, :app)", ['tk'=>$token, 'app'=>$app_id]);
         if ($re) {
             return boolval($re['verify_token']);
@@ -35,8 +35,8 @@ class AccessToken
      */
     public static function getToken($token, $app_id)
     {
-        $db = getDB();
-        $re = $db->getConnection()->get('access_tokens', ['user_id', 'scope'], ['AND'=>['access_token'=>$token, 'app_id'=>$app_id, '#expires_in[>=]'=>'NOW()']]);
+        $db = getDB()->getConnection();
+        $re = $db->get('access_tokens', ['user_id', 'scope'], ['AND'=>['access_token'=>$token, 'app_id'=>$app_id, '#expires_in[>=]'=>'NOW()']]);
         if ($re) {
             return $re;
         }
